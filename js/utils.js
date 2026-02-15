@@ -2,7 +2,7 @@
 
 // in deployment, `IS_DEPLOYED = "<version number>";` should be set below.
 globalThis.IS_DEPLOYED = undefined;
-globalThis.VERSION_NUMBER = /* 5ETOOLS_VERSION__OPEN */"1.213.6"/* 5ETOOLS_VERSION__CLOSE */;
+globalThis.VERSION_NUMBER = /* 5ETOOLS_VERSION__OPEN */"1.213.7"/* 5ETOOLS_VERSION__CLOSE */;
 globalThis.DEPLOYED_IMG_ROOT = undefined;
 // for the roll20 script to set
 globalThis.IS_VTT = false;
@@ -839,6 +839,7 @@ Math.seed = Math.seed || function (s) {
 
 class TemplateUtil {
 	static initJquery () {
+		/* eslint-disable vet-jquery/jquery */
 		/**
 		 * Template strings which can contain jQuery objects.
 		 * Usage: $$`<div>Press this button: ${$btn}</div>`
@@ -871,6 +872,7 @@ class TemplateUtil {
 			if (ele?.nodeType === Node.DOCUMENT_FRAGMENT_NODE) return $([...ele.children]);
 			return $(ele);
 		};
+		/* eslint-enable vet-jquery/jquery */
 	}
 
 	/* -------------------------------------------- */
@@ -923,7 +925,9 @@ class TemplateUtil {
 			eleTmpTemplate.innerHTML = raw.trim();
 			const {content: eleTmp} = eleTmpTemplate;
 
-			Array.from(eleTmp.querySelectorAll(`[data-r="true"]`))
+			if (!eleTmp.children.length) throw new Error(`Failed to create HTML element(s) from "${raw}"!`);
+
+			Array.from(eleTmp.querySelectorAll(".ve-ee-r"))
 				.forEach((node, i) => node.replaceWith(eles[i]));
 
 			const childNodes = Array.from(eleTmp.childNodes);
@@ -943,7 +947,8 @@ class TemplateUtil {
 	static _ee_handleArg (eles, arg) {
 		if (arg instanceof Node) {
 			eles.push(arg);
-			return `<${arg.tagName} data-r="true"></${arg.tagName}>`;
+			// Use a class for performance
+			return `<${arg.tagName} class="ve-ee-r"></${arg.tagName}>`;
 		}
 
 		return arg;
@@ -961,6 +966,7 @@ globalThis.JqueryUtil = class {
 		TemplateUtil.initVanilla();
 		TemplateUtil.initJquery();
 
+		// eslint-disable-next-line vet-jquery/jquery
 		$.fn.extend({
 			// avoid setting input type to "search" as it visually offsets the contents of the input
 			disableSpellcheck: function () { return this.attr("autocomplete", "new-password").attr("autocapitalize", "off").attr("spellcheck", "false"); },
@@ -992,8 +998,9 @@ globalThis.JqueryUtil = class {
 		});
 	}
 
-	static showCopiedEffect ($_ele, {text = "Copied!", isBubble = false} = {}) {
-		const ele = $_ele instanceof $ ? $_ele[0] : $_ele;
+	static showCopiedEffect (ele, {text = "Copied!", isBubble = false} = {}) {
+		// eslint-disable-next-line vet-jquery/jquery
+		ele = ele instanceof $ ? ele[0] : ele;
 
 		const {top, left, width} = ele.getBoundingClientRect();
 
@@ -1060,6 +1067,7 @@ globalThis.JqueryUtil = class {
 					tag: "div",
 					clazz: "toast__wrp-content",
 					children: [
+						// eslint-disable-next-line vet-jquery/jquery
 						options.content instanceof $ ? options.content[0] : options.content,
 					],
 				}),
@@ -1192,6 +1200,7 @@ class ElementUtil {
 	 * @property {function(object): HTMLElementExtended} css
 	 *
 	 * @property {function(string, function, object=): HTMLElementExtended} onn
+	 * @property {function(string, function=, object=): HTMLElementExtended} off
 	 * @property {function(function): HTMLElementExtended} onClick
 	 * @property {function(function): HTMLElementExtended} onContextmenu
 	 * @property {function(function): HTMLElementExtended} onChange
@@ -1374,7 +1383,13 @@ class ElementUtil {
 		},
 	) {
 		if (ele) return {ele, isSetId: true};
-		if (outer) return {ele: (new DOMParser()).parseFromString(outer, "text/html").body.childNodes[0], isSetId: true};
+		if (outer) {
+			const eleTmpTemplate = document.createElement("template");
+			eleTmpTemplate.innerHTML = outer.trim();
+			const {content: eleTmp} = eleTmpTemplate;
+			if (eleTmp.childNodes.length !== 1) throw new Error(`Failed to create exactly one DOM element from HTML "${outer}"!`);
+			return {ele: eleTmp.childNodes[0], isSetId: true};
+		}
 		if (tag) return {ele: document.createElement(tag), isSetId: true};
 		if (id) {
 			const eleId = document.getElementById(id);
@@ -1643,6 +1658,10 @@ class ElementUtil {
 
 	/** @this {HTMLElementExtended} */
 	static _onX (evtName, fn, opts) {
+		// TODO(jquery) migrate
+		if (evtName.includes(" ")) throw new Error(`Event name "${evtName}" contains a space! This should be split into multiple ".onn" calls.`);
+		if (evtName.includes(".")) throw new Error(`Event name "${evtName}" contains a "."! This should be revised as a non-namespaced name.`);
+
 		((this._veListeners ||= {})[evtName] ||= []).push({fn, opts});
 
 		if (opts) this.addEventListener(evtName, fn, opts);
@@ -1652,6 +1671,10 @@ class ElementUtil {
 
 	/** @this {HTMLElementExtended} */
 	static _offX (evtName, fn, opts) {
+		// TODO(jquery) migrate
+		if (evtName.includes(" ")) throw new Error(`Event name "${evtName}" contains a space! This should be split into multiple ".onn" calls.`);
+		if (evtName.includes(".")) throw new Error(`Event name "${evtName}" contains a "."! This should be revised as a non-namespaced name.`);
+
 		if (!fn) {
 			(this._veListeners?.[evtName] || [])
 				.forEach(({fn, opts}) => {
@@ -1961,12 +1984,12 @@ globalThis.MiscUtil = class {
 
 	static async pCopyTextToClipboard (text) {
 		function doCompatibilityCopy () {
-			const $iptTemp = $(`<textarea class="clp__wrp-temp"></textarea>`)
+			const iptTemp = ee`<textarea class="clp__wrp-temp"></textarea>`
 				.appendTo(document.body)
 				.val(text)
-				.select();
+				.selecte();
 			document.execCommand("Copy");
-			$iptTemp.remove();
+			iptTemp.remove();
 		}
 
 		try {
@@ -2911,6 +2934,7 @@ globalThis.EventUtil = class {
 	static getKeyIgnoreCapsLock (evt) {
 		if (!evt.key) return null;
 		if (evt.key.length !== 1) return evt.key;
+		// TODO(jquery) migrate
 		const isCaps = (evt.originalEvent || evt).getModifierState("CapsLock");
 		if (!isCaps) return evt.key;
 		const asciiCode = evt.key.charCodeAt(0);
@@ -3229,7 +3253,7 @@ globalThis.ContextUtil = class {
 			return {
 				action: this,
 				eleRow: ee`<div class="ui-ctx__row ve-flex-v-center ${this.style || ""}">${btnAction}${btnActionAlt}</div>`,
-				eleBtn: btnAction,
+				btn: btnAction,
 			};
 		}
 
@@ -4289,10 +4313,6 @@ globalThis.SortUtil = class {
 	static ascSortSize (a, b) { return Parser.SIZE_ABVS.indexOf(a) - Parser.SIZE_ABVS.indexOf(b); }
 
 	static initBtnSortHandlers (wrpBtnsSort, list) {
-		if (wrpBtnsSort instanceof $) { // TODO(jquery) migrate
-			wrpBtnsSort = wrpBtnsSort[0];
-		}
-
 		let dispCaretInitial = null;
 
 		const dispCarets = [...wrpBtnsSort.querySelectorAll(`[data-sort]`)]
@@ -4332,13 +4352,13 @@ globalThis.SortUtil = class {
 			direction,
 		},
 	) {
-		dispCarets.forEach($it => $it.removeClass("lst__caret--active"));
+		dispCarets.forEach(it => it.removeClass("lst__caret--active"));
 		dispCaret.addClass("lst__caret--active").toggleClass("lst__caret--reverse", direction === "asc");
 	}
 
 	/** Add more list sort on-clicks to existing sort buttons. */
-	static initBtnSortHandlersAdditional ($wrpBtnsSort, list) {
-		[...$wrpBtnsSort[0].querySelectorAll(".sort")]
+	static initBtnSortHandlersAdditional (wrpBtnsSort, list) {
+		[...wrpBtnsSort.querySelectorAll(".sort")]
 			.map(btnSort => {
 				const btnSortField = btnSort.dataset.sort;
 
@@ -5287,11 +5307,14 @@ globalThis.DataUtil = class {
 			}
 
 			if (DataUtil.dbg.isTrackCopied) entParent.dbg_isCopied = true;
+
 			// Handle recursive copy
 			if (entParent._copy) await DataUtil.generic._pMergeCopy(impl, page, entryList, entParent, options);
+			if (!entry._copy) return; // Another merge may have completed for this entry, if multiple entries use it as a parent
 
 			// Preload templates, if required
 			const templates = await this._pMergeCopy_pGetTemplates(entry);
+			if (!entry._copy) return; // Another merge may have completed for this entry, if multiple entries use it as a parent
 
 			return DataUtil.generic.copyApplier.getCopy(impl, MiscUtil.copyFast(entParent), entry, templates, options);
 		}
@@ -9107,11 +9130,11 @@ globalThis.ExtensionUtil = class {
 	}
 
 	static _getElementData ({ele}) {
-		const $parent = $(ele).closest(`[data-page]`);
-		const page = $parent.attr("data-page");
-		const source = $parent.attr("data-source");
-		const hash = $parent.attr("data-hash");
-		const rawExtensionData = $parent.attr("data-extension");
+		const eleParent = e_({ele}).closeste(`[data-page]`);
+		const page = eleParent.attr("data-page");
+		const source = eleParent.attr("data-source");
+		const hash = eleParent.attr("data-hash");
+		const rawExtensionData = eleParent.attr("data-extension");
 		const extensionData = rawExtensionData ? JSON.parse(rawExtensionData) : null;
 
 		return {page, source, hash, extensionData};
@@ -9365,14 +9388,14 @@ if (!globalThis.IS_VTT && typeof window !== "undefined") {
 				"div-gpt-ad-5etools36834", // mobile middle
 			].forEach(id => {
 				const iv = setInterval(() => {
-					const $wrp = $(`#${id}`);
-					if (!$wrp.length) return;
-					if (!$wrp.children().length) return;
-					if ($wrp.children()[0].tagName === "SCRIPT") return;
-					const $tgt = $wrp.closest(".cancer__anchor").find(".cancer__disp-cancer");
-					if ($tgt.length) {
+					const wrp = es(`#${id}`);
+					if (!wrp.length) return;
+					if (!wrp.childrene().length) return;
+					if (wrp.childrene()[0].tagName === "SCRIPT") return;
+					const tgt = wrp.closeste(".cancer__anchor")?.find(".cancer__disp-cancer");
+					if (tgt) {
 						anyFound = true;
-						$tgt.css({display: "flex"}).text("Advertisements");
+						tgt.css({display: "flex"}).text("Advertisements");
 						clearInterval(iv);
 					}
 				}, 250);
@@ -9385,25 +9408,25 @@ if (!globalThis.IS_VTT && typeof window !== "undefined") {
 				if (isPadded) return;
 				isPadded = true;
 				// Pad the bottom of the page so the adhesive unit doesn't overlap the content
-				$(`.view-col-group--cancer`).append(`<div class="w-100 no-shrink" style="height: 110px;"></div>`);
+				em(`.view-col-group--cancer`).forEach(ele => ele.appends(`<div class="w-100 no-shrink" style="height: 110px;"></div>`));
 			}, 300);
 			ivsCancer.push(ivPad);
 		});
 
 		// Hack to lock the ad space at a fixed size--prevents the screen from shifting around once loaded
 		setTimeout(() => {
-			const $wrp = $(`.cancer__wrp-leaderboard-inner`);
-			if (anyFound) $wrp.css({height: 90});
+			const wrps = em(`.cancer__wrp-leaderboard-inner`);
+			if (anyFound) wrps.forEach(ele => ele.css({height: 90}));
 			ivsCancer.forEach(iv => clearInterval(iv));
 		}, 6500);
 	} else {
-		if (!isDbgCancer) window.addEventListener("load", () => $(`.cancer__anchor`).remove());
+		if (!isDbgCancer) window.addEventListener("load", () => em(`.cancer__anchor`).forEach(ele => ele.remove()));
 	}
 
 	if (isDbgCancer) {
 		window.addEventListener("load", () => {
-			$(`.cancer__sidebar-inner--top`).append(`<div style="width: 300px; height: 600px; background: #f0f;"></div>`);
-			$(`.cancer__sidebar-inner--bottom`).append(`<div style="width: 300px; height: 600px; background: #f0f;"></div>`);
+			em(`.cancer__sidebar-inner--top`).forEach(ele => ele.appends(`<div style="width: 300px; height: 600px; background: #f0f;"></div>`));
+			em(`.cancer__sidebar-inner--bottom`).forEach(ele => ele.appends(`<div style="width: 300px; height: 600px; background: #f0f;"></div>`));
 		});
 	}
 	// endregion
