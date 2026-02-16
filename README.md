@@ -15,3 +15,26 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 ## License
 
 This project is licensed under the terms of the MIT license.
+
+## Atualizando Fork
+
+- Configurar remote (apenas a primeira vez)
+```bash
+git remote add upstream https://github.com/repo/repo.git
+```
+- Buscar as alterações do original
+```bash
+git fetch upstream
+```
+- Ir para a branch principal (ex.: main)
+```bash
+git checkout main
+```
+- Mesclar as alterações do original na sua branch
+```bash
+git merge upstream/main
+```
+- Enviar para o seu fork no GitHub
+```bash
+git push origin main
+```
