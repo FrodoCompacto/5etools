@@ -20,7 +20,7 @@ This project is licensed under the terms of the MIT license.
 
 - Configurar remote (apenas a primeira vez)
 ```bash
-git remote add upstream https://github.com/repo/repo.git
+git remote add upstream https://github.com/user/repo.git
 ```
 - Buscar as alterações do original
 ```bash
