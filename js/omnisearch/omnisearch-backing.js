@@ -1,6 +1,5 @@
 import {OmnisearchState} from "./omnisearch-state.js";
 import {VetoolsConfig} from "../utils-config/utils-config-config.js";
-import {SITE_STYLE__CLASSIC} from "../consts.js";
 import {SyntaxMetaCategories, SyntaxMetaGroup, SyntaxMetaPageRange, SyntaxMetaSource} from "./omnisearch-models.js";
 import {PARTNERED_CONTENT_MODE_ALL, PARTNERED_CONTENT_MODE_LOCAL, PARTNERED_CONTENT_MODE_NONE} from "./omnisearch-consts.js";
 
@@ -20,8 +19,7 @@ export class OmnisearchBacking {
 		elasticlunr.clearStopWords();
 		this._searchIndex = elasticlunr(function () {
 			this.addField("n");
-			this.addField("cf");
-			this.addField("s");
+			this.addField("sA");
 			this.setRef("id");
 		});
 		SearchUtil.removeStemmer(this._searchIndex);
@@ -71,6 +69,7 @@ export class OmnisearchBacking {
 	static _addToIndex (d) {
 		this._maxId = d.id;
 		d.cf = Parser.pageCategoryToFull(d.c);
+		d.sA ||= d.s ? Parser.sourceJsonToAbv(d.s) : null;
 		if (!this._CATEGORY_COUNTS[d.cf]) this._CATEGORY_COUNTS[d.cf] = 1;
 		else this._CATEGORY_COUNTS[d.cf]++;
 		this._searchIndex.addDoc(d);
@@ -145,7 +144,9 @@ export class OmnisearchBacking {
 
 	/* -------------------------------------------- */
 
-	static async pGetFilteredResults (results, {isApplySrdFilter = false, isApplyPartneredFilter = false} = {}) {
+	static async pGetFilteredResults (results, {isApplySrdFilter = false, isApplyPartneredFilter = false, searchTerm = null} = {}) {
+		if (searchTerm) searchTerm = searchTerm.toLowerCase();
+
 		if (isApplySrdFilter && OmnisearchState.isSrdOnly) {
 			results = results.filter(res => res.doc.r || res.doc.r2);
 		}
@@ -194,7 +195,7 @@ export class OmnisearchBacking {
 
 		const styleHint = VetoolsConfig.get("styleSwitcher", "style");
 		results
-			.forEach(result => this._mutResultScores({result, styleHint}));
+			.forEach(result => this._mutResultScores({result, styleHint, searchTerm}));
 		results.sort((a, b) => SortUtil.ascSort(b.score, a.score));
 
 		return results;
@@ -270,7 +271,7 @@ export class OmnisearchBacking {
 				.filter(Boolean),
 		});
 
-		return this.pGetFilteredResults(results, {isApplySrdFilter: true, isApplyPartneredFilter: true});
+		return this.pGetFilteredResults(results, {isApplySrdFilter: true, isApplyPartneredFilter: true, searchTerm});
 	}
 
 	static _pGetResults_pGetBaseResults (
@@ -285,7 +286,7 @@ export class OmnisearchBacking {
 				{
 					fields: {
 						n: {boost: 5, expand: true},
-						s: {expand: true},
+						sA: {expand: true},
 					},
 					bool: "AND",
 					expand: true,
@@ -300,7 +301,7 @@ export class OmnisearchBacking {
 					{
 						fields: {
 							n: {boost: 5, expand: true},
-							s: {expand: true},
+							sA: {expand: true},
 						},
 						bool: "AND",
 						expand: true,
@@ -311,8 +312,15 @@ export class OmnisearchBacking {
 		return resultsUnfiltered
 			.filter(res => {
 				const resCache = {
-					source: res.doc.s ? Parser.sourceJsonToAbv(res.doc.s).toLowerCase() : null,
-					category: res.doc.cf.toLowerCase(),
+					source: res.doc.s
+						? [
+							Parser.sourceJsonToAbv(res.doc.s).toLowerCase(),
+							res.doc.s.toLowerCase(),
+						]
+						: null,
+					category: [
+						res.doc.cf.toLowerCase(),
+					],
 				};
 				return syntaxMetas.every(syntaxMeta => syntaxMeta.isMatch(res, resCache));
 			});
@@ -332,7 +340,22 @@ export class OmnisearchBacking {
 		Parser.CAT_ID_CARD,
 	]);
 
-	static _mutResultScores ({result, styleHint}) {
+	static _CATEGORIES_CORPORA = new Set([
+		Parser.CAT_ID_ADVENTURE,
+		Parser.CAT_ID_BOOK,
+	]);
+
+	static _mutResultScores ({result, styleHint, searchTerm = null}) {
+		// Hoist adventure/books if their exact source abbreviation is given
+		if (searchTerm && result.doc.s && this._CATEGORIES_CORPORA.has(result.doc.c)) {
+			if (
+				result.doc.s.toLowerCase() === searchTerm
+				|| result.doc.sA.toLowerCase() === searchTerm
+			) {
+				result.score *= 1.1;
+			}
+		}
+
 		if (this._SOURCES_CORE_LEGACY.has(result.doc.s)) result.score *= 1.1;
 		if (SourceUtil.isNonstandardSource(result.doc.s)) result.score *= 0.66;
 		if (SourceUtil.isLegacySourceWotc(result.doc.s)) result.score *= 0.75;
