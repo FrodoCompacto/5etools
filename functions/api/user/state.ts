@@ -1,5 +1,5 @@
-import type { Env } from "../../auth/_lib";
-import { getCookie, decodeJwt } from "../../auth/_lib";
+import type { Env } from "../auth/_lib";
+import { getCookie, decodeJwt } from "../auth/_lib";
 
 const MAX_STATE_JSON_LENGTH = 2 * 1024 * 1024; // ~2MB
 
