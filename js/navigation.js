@@ -52,37 +52,6 @@ class NavBar {
 			const res = await fetch("/api/auth/me", { credentials: "same-origin" });
 			if (!res.ok) return;
 
-			// Mark as logged in (for any global sync logic)
-			try {
-				globalThis.UserStateSync && globalThis.UserStateSync.setLoggedIn && globalThis.UserStateSync.setLoggedIn(true);
-			} catch (e) {
-				// ignore
-			}
-
-			// Apply server-side user state once per tab/session
-			try {
-				const sess = window.sessionStorage;
-				const key = "5etools_user_state_loaded";
-				if (sess.getItem(key) !== "1") {
-					const stateRes = await fetch("/api/user/state", { credentials: "same-origin" });
-					if (stateRes.ok) {
-						const dump = await stateRes.json();
-						if (dump && typeof dump === "object") {
-							if (dump.sync) StorageUtil.syncSetFromDump(dump.sync);
-							if (dump.async) await StorageUtil.pSetFromDump(dump.async);
-							if (dump.syncStyle && globalThis.styleSwitcher?.constructor?.syncSetFromStorageDump) {
-								globalThis.styleSwitcher.constructor.syncSetFromStorageDump(dump.syncStyle);
-							}
-							sess.setItem(key, "1");
-							window.location.reload();
-							return;
-						}
-					}
-				}
-			} catch (e) {
-				// Ignore and fall back to local-only state
-			}
-
 			// Update button to show Logout behavior
 			el.innerHTML = "Logout";
 			el.onclick = async () => {
@@ -227,6 +196,23 @@ class NavBar {
 				html: "Login",
 				click: () => { window.location.href = "/api/auth/google"; },
 				dataNav: "user-auth-action",
+			},
+		);
+		this._addElement_divider({keyPath: [NavBar._CAT_SETTINGS]});
+		this._addElement_button(
+			{
+				keyPath: [NavBar._CAT_SETTINGS],
+				html: "Save User Config",
+				click: async (evt) => NavBar.InteractionManager._pOnClick_button_saveUserState(evt),
+				title: "Save your current configuration to your account (requires login).",
+			},
+		);
+		this._addElement_button(
+			{
+				keyPath: [NavBar._CAT_SETTINGS],
+				html: "Load User Config",
+				click: async (evt) => NavBar.InteractionManager._pOnClick_button_loadUserState(evt),
+				title: "Load configuration from your account (requires login).",
 			},
 		);
 		this._addElement_divider({keyPath: [NavBar._CAT_SETTINGS]});
@@ -955,6 +941,76 @@ NavBar.InteractionManager = class {
 			location.reload();
 		} catch (e) {
 			JqueryUtil.doToast({type: "danger", content: `Failed to load state! ${VeCt.STR_SEE_CONSOLE}`});
+			throw e;
+		}
+	}
+
+	static async _pOnClick_button_saveUserState (evt) {
+		evt.preventDefault();
+
+		try {
+			const meRes = await fetch("/api/auth/me", {credentials: "same-origin"});
+			if (!meRes.ok) {
+				JqueryUtil.doToast({type: "warning", content: `You must be logged in to save user configuration.`});
+				return;
+			}
+
+			const sync = StorageUtil.syncGetDump();
+			const async = await StorageUtil.pGetDump();
+			const syncStyle = globalThis.styleSwitcher.constructor.syncGetStorageDump();
+			const dump = {sync, async, syncStyle};
+
+			const res = await fetch("/api/user/state", {
+				method: "PUT",
+				credentials: "same-origin",
+				headers: {"Content-Type": "application/json"},
+				body: JSON.stringify(dump),
+			});
+
+			if (!res.ok) {
+				JqueryUtil.doToast({type: "danger", content: `Failed to save user configuration. ${VeCt.STR_SEE_CONSOLE}`});
+				return;
+			}
+
+			JqueryUtil.doToast({type: "success", content: `User configuration saved.`});
+		} catch (e) {
+			JqueryUtil.doToast({type: "danger", content: `Failed to save user configuration. ${VeCt.STR_SEE_CONSOLE}`});
+			throw e;
+		}
+	}
+
+	static async _pOnClick_button_loadUserState (evt) {
+		evt.preventDefault();
+
+		try {
+			const meRes = await fetch("/api/auth/me", {credentials: "same-origin"});
+			if (!meRes.ok) {
+				JqueryUtil.doToast({type: "warning", content: `You must be logged in to load user configuration.`});
+				return;
+			}
+
+			const res = await fetch("/api/user/state", {credentials: "same-origin"});
+			if (!res.ok) {
+				JqueryUtil.doToast({type: "danger", content: `Failed to load user configuration. ${VeCt.STR_SEE_CONSOLE}`});
+				return;
+			}
+
+			const dump = await res.json();
+			if (!dump || typeof dump !== "object") {
+				JqueryUtil.doToast({type: "danger", content: `Invalid user configuration received.`});
+				return;
+			}
+
+			if (dump.sync) StorageUtil.syncSetFromDump(dump.sync);
+			if (dump.async) await StorageUtil.pSetFromDump(dump.async);
+			if (dump.syncStyle && globalThis.styleSwitcher?.constructor?.syncSetFromStorageDump) {
+				globalThis.styleSwitcher.constructor.syncSetFromStorageDump(dump.syncStyle);
+			}
+
+			JqueryUtil.doToast({type: "success", content: `User configuration loaded. Reloading...`});
+			location.reload();
+		} catch (e) {
+			JqueryUtil.doToast({type: "danger", content: `Failed to load user configuration. ${VeCt.STR_SEE_CONSOLE}`});
 			throw e;
 		}
 	}
