@@ -50,13 +50,45 @@ class NavBar {
 		if (!el) return;
 		try {
 			const res = await fetch("/api/auth/me", { credentials: "same-origin" });
-			if (res.ok) {
-				el.innerHTML = "Logout";
-				el.onclick = async () => {
-					await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" });
-					window.location.reload();
-				};
+			if (!res.ok) return;
+
+			// Mark as logged in (for any global sync logic)
+			try {
+				globalThis.UserStateSync && globalThis.UserStateSync.setLoggedIn && globalThis.UserStateSync.setLoggedIn(true);
+			} catch (e) {
+				// ignore
 			}
+
+			// Apply server-side user state once per tab/session
+			try {
+				const sess = window.sessionStorage;
+				const key = "5etools_user_state_loaded";
+				if (sess.getItem(key) !== "1") {
+					const stateRes = await fetch("/api/user/state", { credentials: "same-origin" });
+					if (stateRes.ok) {
+						const dump = await stateRes.json();
+						if (dump && typeof dump === "object") {
+							if (dump.sync) StorageUtil.syncSetFromDump(dump.sync);
+							if (dump.async) await StorageUtil.pSetFromDump(dump.async);
+							if (dump.syncStyle && globalThis.styleSwitcher?.constructor?.syncSetFromStorageDump) {
+								globalThis.styleSwitcher.constructor.syncSetFromStorageDump(dump.syncStyle);
+							}
+							sess.setItem(key, "1");
+							window.location.reload();
+							return;
+						}
+					}
+				}
+			} catch (e) {
+				// Ignore and fall back to local-only state
+			}
+
+			// Update button to show Logout behavior
+			el.innerHTML = "Logout";
+			el.onclick = async () => {
+				await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" });
+				window.location.reload();
+			};
 		} catch (_) {
 			// Leave as Login
 		}

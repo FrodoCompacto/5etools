@@ -7773,6 +7773,14 @@ function StorageUtilBase () {
 
 	this.getPageKey = function (key, page) { return `${key}_${page || UrlUtil.getCurrentPage()}`; };
 
+	this._fireStorageChanged = function () {
+		try {
+			if (typeof this._onStorageChanged === "function") this._onStorageChanged();
+		} catch (e) {
+			// Ignore callback errors
+		}
+	};
+
 	// region Synchronous
 	this.syncGet = function (key) {
 		const rawOut = this._getSyncStorage().getItem(key);
@@ -7783,11 +7791,13 @@ function StorageUtilBase () {
 	this.syncSet = function (key, value) {
 		this._getSyncStorage().setItem(key, JSON.stringify(value));
 		this._syncTrackKey(key);
+		this._fireStorageChanged();
 	};
 
 	this.syncRemove = function (key) {
 		this._getSyncStorage().removeItem(key);
 		this._syncTrackKey(key, true);
+		this._fireStorageChanged();
 	};
 
 	this.syncGetForPage = function (key) { return this.syncGet(`${key}_${UrlUtil.getCurrentPage()}`); };
@@ -7834,7 +7844,9 @@ function StorageUtilBase () {
 	this.pSet = async function (key, value) {
 		this._pTrackKey(key).then(null);
 		const storage = await this._getAsyncStorage();
-		return storage.setItem(key, value);
+		const out = await storage.setItem(key, value);
+		this._fireStorageChanged();
+		return out;
 	};
 
 	this.pGet = async function (key) {
@@ -7845,7 +7857,9 @@ function StorageUtilBase () {
 	this.pRemove = async function (key) {
 		this._pTrackKey(key, true).then(null);
 		const storage = await this._getAsyncStorage();
-		return storage.removeItem(key);
+		const out = await storage.removeItem(key);
+		this._fireStorageChanged();
+		return out;
 	};
 
 	this.pGetForPage = async function (key, {page = null} = {}) { return this.pGet(this.getPageKey(key, page)); };
