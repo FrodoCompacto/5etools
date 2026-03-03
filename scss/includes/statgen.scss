@@ -18,6 +18,18 @@
 					background-color: vars.$rgb-border-grey--muted;
 				}
 
+				&[type="number"]::-webkit-inner-spin-button,
+				&[type="number"]::-webkit-outer-spin-button {
+					/* stylelint-disable-next-line property-no-vendor-prefix */
+					-webkit-appearance: none;
+					margin: 0;
+				}
+
+				&[type="number"] {
+					/* stylelint-disable-next-line property-no-vendor-prefix */
+					-moz-appearance: textfield;
+				}
+
 				&--sel {
 					width: 64px;
 					text-align-last: center;
@@ -102,6 +114,12 @@
 				width: 40px;
 				min-height: 20px;
 			}
+		}
+
+		// Ticker buttons always visible in statgen (compact cells)
+		.statgen-shared__ipt + .ui-ideco__wrp .ui-ideco__btn-ticker,
+		.ui-ideco__wrp .ui-ideco__btn-ticker {
+			opacity: 1;
 		}
 	}
 }

@@ -390,6 +390,34 @@ class _PageGeneratorStatgen extends PageGeneratorGeneric {
 	];
 }
 
+class _PageGeneratorCharactermancer extends PageGeneratorGeneric {
+	_filename = "page/template-page-charactermancer.hbs";
+	_page = "charactermancer.html";
+
+	_pageTitle = "Charactermancer";
+	_navbarDescription = "Step-by-step character creation wizard.";
+
+	_isFontAwesome = true;
+	_stylesheets = [
+		"charactermancer-bundle",
+		"statgen-bundle",
+	];
+
+	_scriptsUtilsAdditional = [
+		"filter-common.js",
+		"filter-races.js",
+		"filter-backgrounds.js",
+		"filter-feats.js",
+		"filter-classes.js",
+		"filter-spells.js",
+		"filter-items.js",
+	];
+
+	_scriptsModules = [
+		"charactermancer.js",
+	];
+}
+
 export const PAGE_GENERATORS = 	[
 	...PAGE_GENERATORS_LISTPAGE,
 	...PAGE_GENERATORS_REDIRECT,
@@ -416,4 +444,5 @@ export const PAGE_GENERATORS = 	[
 	new _PageGeneratorRenderdemo(),
 	new _PageGeneratorSearch(),
 	new _PageGeneratorStatgen(),
+	new _PageGeneratorCharactermancer(),
 ];

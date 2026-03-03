@@ -1,0 +1,9 @@
+@use "../vars/vars-night";
+
+@layer vetools {
+	.ve-night-mode .charactermancer {
+		&__step-btn--active {
+			background: vars-night.$rgb-bg--alt-night;
+		}
+	}
+}

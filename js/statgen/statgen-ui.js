@@ -838,47 +838,55 @@ export class StatGenUi extends BaseComponent {
 
 			// region Point buy
 			const propPb = `pb_${ab}`;
-			const iptPb = ComponentUiUtil.getIptInt(
+			const {min: minScore, max: maxScore} = this._pb_getMinMaxScores();
+			const {wrp: wrpPb} = ComponentUiUtil.getIptInt(
 				this,
 				propPb,
 				0,
 				{
 					fallbackOnNaN: 0,
-					min: 0,
+					min: minScore,
+					max: maxScore,
+					asMeta: true,
+					decorationRight: "ticker",
 					html: `<input class="form-control form-control--minimal statgen-shared__ipt ve-text-right" type="number">`,
 				},
 			);
 
 			const hkPb = () => {
-				const {min: minScore, max: maxScore} = this._pb_getMinMaxScores();
-				this._state[propPb] = Math.min(maxScore, Math.max(minScore, this._state[propPb]));
+				const {min: minPb, max: maxPb} = this._pb_getMinMaxScores();
+				this._state[propPb] = Math.min(maxPb, Math.max(minPb, this._state[propPb]));
 			};
 			this._addHookBase(propPb, hkPb);
 			hkPb();
 
-			elesPb.push(iptPb);
+			elesPb.push(wrpPb);
 			// endregion
 
 			// region Manual
 			const {propAbilValue} = this.constructor._manual_getProps(ab);
-			const iptManual = ComponentUiUtil.getIptInt(
+			const {wrp: wrpManual} = ComponentUiUtil.getIptInt(
 				this,
 				propAbilValue,
 				0,
 				{
 					fallbackOnNaN: 0,
+					min: 1,
+					max: 30,
+					asMeta: true,
+					decorationRight: "ticker",
 					html: `<input class="form-control form-control--minimal statgen-shared__ipt ve-text-right" type="number">`,
 				},
 			);
 
-			elesManual.push(iptManual);
+			elesManual.push(wrpManual);
 			// endregion
 
 			return ee`<label class="my-1 statgen-pb__cell">
 				${selRolled}
 				${selArray}
-				${iptPb}
-				${iptManual}
+				${wrpPb}
+				${wrpManual}
 			</label>`;
 		});
 
@@ -1044,16 +1052,20 @@ export class StatGenUi extends BaseComponent {
 	_render_getWrpsUser () {
 		return Parser.ABIL_ABVS.map(ab => {
 			const {propUserBonus} = this.constructor._common_getProps(ab);
-			const ipt = ComponentUiUtil.getIptInt(
+			const {wrp} = ComponentUiUtil.getIptInt(
 				this,
 				propUserBonus,
 				0,
 				{
 					fallbackOnNaN: 0,
+					min: -10,
+					max: 30,
+					asMeta: true,
+					decorationRight: "ticker",
 					html: `<input class="form-control form-control--minimal statgen-shared__ipt ve-text-right" type="number">`,
 				},
 			);
-			return ee`<label class="my-1 statgen-pb__cell">${ipt}</label>`;
+			return ee`<label class="my-1 statgen-pb__cell">${wrp}</label>`;
 		});
 	}
 

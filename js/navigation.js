@@ -10,7 +10,7 @@ class NavBar {
 	static _CAT_ADVENTURES = "Adventures";
 	static _CAT_REFERENCES = "References";
 	static _CAT_UTILITIES = "Utilities";
-	static _CAT_SETTINGS = "Settings";
+	static _CAT_SETTINGS = "User";
 	static _CAT_CACHE = "Preload Data";
 
 	static _navbar = null;
@@ -42,6 +42,24 @@ class NavBar {
 		NavBar._clearAllTimers();
 
 		NavBar._initAdventureBookElements().then(null);
+		NavBar._updateUserAuthButton();
+	}
+
+	static async _updateUserAuthButton () {
+		const el = document.querySelector("[data-nav=\"user-auth-action\"]");
+		if (!el) return;
+		try {
+			const res = await fetch("/api/auth/me", { credentials: "same-origin" });
+			if (res.ok) {
+				el.innerHTML = "Logout";
+				el.onclick = async () => {
+					await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" });
+					window.location.reload();
+				};
+			}
+		} catch (_) {
+			// Leave as Login
+		}
 	}
 
 	static _initInstallPrompt () {
@@ -87,6 +105,8 @@ class NavBar {
 		this._addElement_divider({keyPath: [NavBar._CAT_PLAYER]});
 		this._addElement_li({keyPath: [NavBar._CAT_PLAYER], page: "lifegen.html", aText: "This Is Your Life"});
 		this._addElement_li({keyPath: [NavBar._CAT_PLAYER], page: "names.html", aText: "Names"});
+		this._addElement_divider({keyPath: [NavBar._CAT_PLAYER]});
+		this._addElement_li({keyPath: [NavBar._CAT_PLAYER], page: "charactermancer.html", aText: "Charactermancer"});
 
 		this._addElement_dropdown({category: NavBar._CAT_DUNGEON_MASTER});
 		this._addElement_li({keyPath: [NavBar._CAT_DUNGEON_MASTER], page: "dmscreen.html", aText: "DM Screen"});
@@ -169,6 +189,15 @@ class NavBar {
 		this._addElement_li({keyPath: [NavBar._CAT_UTILITIES], page: "privacy-policy.html", aText: "Privacy Policy"});
 
 		this._addElement_dropdown({category: NavBar._CAT_SETTINGS});
+		this._addElement_button(
+			{
+				keyPath: [NavBar._CAT_SETTINGS],
+				html: "Login",
+				click: () => { window.location.href = "/api/auth/google"; },
+				dataNav: "user-auth-action",
+			},
+		);
+		this._addElement_divider({keyPath: [NavBar._CAT_SETTINGS]});
 		this._addElement_button(
 			{
 				keyPath: [NavBar._CAT_SETTINGS],
@@ -620,6 +649,7 @@ class NavBar {
 			context = null,
 			title,
 			className,
+			dataNav,
 		},
 	) {
 		const parentNode = this._tree.getNode({keyPath});
@@ -629,6 +659,7 @@ class NavBar {
 
 		const eleSpan = document.createElement("span");
 		if (className) eleSpan.className = className;
+		if (dataNav) eleSpan.setAttribute("data-nav", dataNav);
 		eleSpan.onclick = click;
 		eleSpan.innerHTML = html;
 

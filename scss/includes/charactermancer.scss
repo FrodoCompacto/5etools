@@ -1,0 +1,73 @@
+@use "../vars/vars";
+
+@layer vetools {
+	.charactermancer {
+		// region two-col wrapper — mirrors view-col-wrapper sizing within parent flex col
+		&__col-wrapper {
+			flex: 1;
+			min-height: 0;
+		}
+
+		// left column: stepper fixed at top, content scrolls below
+		&__left-col {
+			min-width: 0;
+			overflow: hidden;
+		}
+
+		// right column: statblock summary — keep readable width so class-tab buttons don't squeeze it
+		&__right-col {
+			min-width: 280px;
+		}
+
+		// class step: grid of buttons so they wrap inside the column instead of forcing width
+		&__step-class {
+			min-width: 0;
+		}
+		&__class-list {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+			gap: 0.5rem;
+		}
+		// endregion
+
+		// region stepper
+		&__stepper {
+			flex-shrink: 0;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+			margin-bottom: 1rem;
+			padding-bottom: 0.5rem;
+			border-bottom: 1px solid vars.$rgb-border-grey--trans;
+		}
+
+		&__step-btn {
+			padding: 0.25rem 0.5rem;
+			font-size: 0.9rem;
+			border-radius: 3px;
+
+			&--active {
+				font-weight: bold;
+				background: vars.$rgb-border-grey--muted;
+			}
+
+			&--complete {
+				opacity: 0.8;
+			}
+		}
+
+		&__content {
+			flex: 1;
+			min-height: 0;
+			overflow-y: auto;
+		}
+		// endregion
+
+		&__export-btns {
+			display: flex;
+			gap: 0.5rem;
+			margin-top: 1rem;
+			flex-wrap: wrap;
+		}
+	}
+}
