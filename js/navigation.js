@@ -52,6 +52,14 @@ class NavBar {
 			const res = await fetch("/api/auth/me", { credentials: "same-origin" });
 			if (!res.ok) return;
 
+			// Show user-config buttons only when logged in
+			const elsSaveCfg = document.querySelectorAll("[data-nav=\"user-save-config\"]");
+			elsSaveCfg.forEach(ele => ele.classList.remove("ve-hidden"));
+			const elsLoadCfg = document.querySelectorAll("[data-nav=\"user-load-config\"]");
+			elsLoadCfg.forEach(ele => ele.classList.remove("ve-hidden"));
+			const elsCfgDivider = document.querySelectorAll("[data-nav=\"user-config-divider\"]");
+			elsCfgDivider.forEach(ele => ele.classList.remove("ve-hidden"));
+
 			// Update button to show Logout behavior
 			el.innerHTML = "Logout";
 			el.onclick = async () => {
@@ -198,13 +206,19 @@ class NavBar {
 				dataNav: "user-auth-action",
 			},
 		);
-		this._addElement_divider({keyPath: [NavBar._CAT_SETTINGS]});
+		this._addElement_divider({
+			keyPath: [NavBar._CAT_SETTINGS],
+			className: "ve-dropdown-divider ve-hidden",
+			dataNav: "user-config-divider",
+		});
 		this._addElement_button(
 			{
 				keyPath: [NavBar._CAT_SETTINGS],
 				html: "Save User Config",
 				click: async (evt) => NavBar.InteractionManager._pOnClick_button_saveUserState(evt),
 				title: "Save your current configuration to your account (requires login).",
+				className: "ve-hidden",
+				dataNav: "user-save-config",
 			},
 		);
 		this._addElement_button(
@@ -213,12 +227,15 @@ class NavBar {
 				html: "Load User Config",
 				click: async (evt) => NavBar.InteractionManager._pOnClick_button_loadUserState(evt),
 				title: "Load configuration from your account (requires login).",
+				className: "ve-hidden",
+				dataNav: "user-load-config",
 			},
 		);
 		this._addElement_divider({keyPath: [NavBar._CAT_SETTINGS]});
+		this._addElement_dropdown({keyPath: [NavBar._CAT_SETTINGS], category: "Settings", isSide: true});
 		this._addElement_button(
 			{
-				keyPath: [NavBar._CAT_SETTINGS],
+				keyPath: [NavBar._CAT_SETTINGS, "Settings"],
 				html: "Preferences",
 				click: () => {
 					ConfigUi.show();
@@ -226,10 +243,10 @@ class NavBar {
 				},
 			},
 		);
-		this._addElement_divider({keyPath: [NavBar._CAT_SETTINGS]});
+		this._addElement_divider({keyPath: [NavBar._CAT_SETTINGS, "Settings"]});
 		this._addElement_button(
 			{
-				keyPath: [NavBar._CAT_SETTINGS],
+				keyPath: [NavBar._CAT_SETTINGS, "Settings"],
 				html: "Save State to File",
 				click: async (evt) => NavBar.InteractionManager._pOnClick_button_saveStateFile(evt),
 				title: "Save any locally-stored data (loaded homebrew, active blocklists, DM Screen configuration,...) to a file.",
@@ -237,16 +254,16 @@ class NavBar {
 		);
 		this._addElement_button(
 			{
-				keyPath: [NavBar._CAT_SETTINGS],
+				keyPath: [NavBar._CAT_SETTINGS, "Settings"],
 				html: "Load State from File",
 				click: async (evt) => NavBar.InteractionManager._pOnClick_button_loadStateFile(evt),
 				title: "Load previously-saved data (loaded homebrew, active blocklists, DM Screen configuration,...) from a file.",
 			},
 		);
-		this._addElement_divider({keyPath: [NavBar._CAT_SETTINGS]});
+		this._addElement_divider({keyPath: [NavBar._CAT_SETTINGS, "Settings"]});
 		this._addElement_button(
 			{
-				keyPath: [NavBar._CAT_SETTINGS],
+				keyPath: [NavBar._CAT_SETTINGS, "Settings"],
 				html: "Add as App",
 				click: async (evt) => NavBar.InteractionManager._pOnClick_button_addApp(evt),
 				title: "Add the site to your home screen. When used in conjunction with the Preload Offline Data option, this can create a functional offline copy of the site.",
@@ -570,12 +587,13 @@ class NavBar {
 		return Parser.sourceJsonToMarkerHtml(source, {isAddBrackets: true, additionalStyles: "ml-1 nav2-list__disp-legacy-marker"});
 	}
 
-	static _addElement_divider ({keyPath}) {
+	static _addElement_divider ({keyPath, className, dataNav} = {}) {
 		const parentNode = this._tree.getNode({keyPath});
 
 		const li = document.createElement("li");
 		li.setAttribute("role", "presentation");
-		li.className = "ve-dropdown-divider";
+		li.className = className || "ve-dropdown-divider";
+		if (dataNav) li.setAttribute("data-nav", dataNav);
 
 		parentNode.getBodyElement().appendChild(li);
 	}
