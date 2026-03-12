@@ -19,14 +19,91 @@
 			min-width: 280px;
 		}
 
-		// class step: grid of buttons so they wrap inside the column instead of forcing width
+		// class step
 		&__step-class {
 			min-width: 0;
 		}
+		&__class-viewer {
+			display: flex;
+			min-height: 0;
+			gap: 0.75rem;
+		}
+
+		&__class-list-col {
+			flex: 0 0 220px;
+			max-width: 260px;
+			min-width: 0;
+			display: flex;
+			flex-direction: column;
+			min-height: 0;
+		}
+
+		&__source-filter {
+			font-size: 0.85rem;
+		}
+
 		&__class-list {
-			display: grid;
-			grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-			gap: 0.5rem;
+			margin-top: 0.25rem;
+			padding-right: 0.25rem;
+			display: flex;
+			flex-direction: column;
+			gap: 0.25rem;
+			overflow-y: auto;
+		}
+
+		&__class-detail-col {
+			flex: 1 1 auto;
+			min-width: 0;
+			min-height: 0;
+			overflow-y: auto;
+		}
+
+		&__sc-tabs {
+			margin-top: 0.25rem;
+		}
+
+		&__sc-tab {
+			font-size: 0.75rem;
+		}
+
+		&__class-features {
+			margin-top: 0.5rem;
+		}
+
+		// Embedded classes component (cmcls__)
+		.cmcls__viewer-root {
+			overflow: hidden;
+		}
+		.cmcls__root {
+			display: flex;
+			flex-direction: column;
+			gap: 0;
+			overflow: hidden;
+		}
+		.cmcls__row {
+			display: flex;
+			flex: 0 0 auto;
+		}
+		.cmcls__col-left {
+			flex: 0 0 25%;
+			min-width: 0;
+			overflow-y: auto;
+		}
+		.cmcls__col-right {
+			flex: 1 1 auto;
+			min-width: 0;
+			overflow-y: auto;
+			overflow-x: auto;
+		}
+		#cmcls__list {
+			overflow-y: auto;
+			min-height: 120px;
+		}
+		#cmcls__classtable {
+			min-height: 0;
+		}
+		#cmcls__sticky-nav {
+			overflow-y: auto;
 		}
 		// endregion
 

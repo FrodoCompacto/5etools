@@ -4,8 +4,7 @@ import {exportToFoundry} from "./charactermancer/charactermancer-export-foundry.
 
 const STEPS = [
 	{id: "basics", name: "Basics", desc: "Ability Scores, Race, Background"},
-	{id: "class", name: "Class", desc: "Choose your class"},
-	{id: "subclass", name: "Subclass", desc: "Choose your subclass"},
+	{id: "class", name: "Class", desc: "Choose your class and subclass"},
 	{id: "equipment", name: "Equipment", desc: "Starting equipment"},
 	{id: "spells", name: "Spells", desc: "Spell selection"},
 	{id: "proficiencies", name: "Proficiencies", desc: "Skills, tools, languages"},
@@ -62,6 +61,15 @@ class CharactermancerPage {
 		this._statGenUi.addHookAll("state", () => this._pSaveStatGenState());
 
 		this._render(es(`#charactermancer-main`));
+
+		// Bind local Manage Content buttons to the shared brew/prerelease manager
+		import("./utils-brew/utils-brew-ui-manage.js")
+			.then(({ManageBrewUi}) => {
+				const btngroup = e_({id: "charactermancer-btngroup-manager"});
+				if (btngroup) ManageBrewUi.bindBtngroupManager(btngroup);
+			})
+			.catch(() => {});
+
 		this._handleHashLoad();
 		window.addEventListener("hashchange", () => this._handleHashLoad());
 		window.dispatchEvent(new Event("toolsLoaded"));
@@ -89,7 +97,7 @@ class CharactermancerPage {
 				this._state.hp = data.hp || 0;
 				this._state.senses = data.senses || {};
 				if (data.proficiencies) Object.assign(this._state.proficiencies, data.proficiencies);
-				this._setStep(6);
+				this._setStep(5);
 				JqueryUtil.doToast({content: "Loaded character from link!"});
 			}
 		} catch (e) {
@@ -148,10 +156,28 @@ class CharactermancerPage {
 	}
 
 	async _pLoadClasses () {
-		const data = await DataUtil.class.loadJSON();
-		return (data.class || []).filter(cls => {
+		const [siteData, prereleaseData, brewData] = await Promise.all([
+			DataUtil.class.loadJSON(),
+			DataUtil.class.loadPrerelease(),
+			DataUtil.class.loadBrew(),
+		]);
+
+		const allClasses = [
+			...(siteData.class || []),
+			...((prereleaseData && prereleaseData.class) || []),
+			...((brewData && brewData.class) || []),
+		];
+
+		const seenHashes = new Set();
+
+		return allClasses.filter(cls => {
+			if (!cls) return false;
 			if (cls.isSidekick) return false;
+
 			const hash = UrlUtil.URL_TO_HASH_BUILDER[UrlUtil.PG_CLASSES](cls);
+			if (seenHashes.has(hash)) return false;
+			seenHashes.add(hash);
+
 			return !ExcludeUtil.isExcluded(hash, "class", cls.source);
 		});
 	}
@@ -310,83 +336,49 @@ class CharactermancerPage {
 		this._$content.append(wrp);
 	}
 
-	_renderStepClass () {
+	async _renderStepClass () {
 		this._syncStateFromStatGen();
 
-		const wrp = ee`<div class="ve-flex-col charactermancer__step-class">
-			<h4 class="mb-2">Choose your class</h4>
-			<p class="ve-muted mb-3">Select a class for your character.</p>
-			<button class="ve-btn ve-btn-default ve-btn-sm mb-2 charactermancer__back-btn">← Back to Basics</button>
-			<input type="text" class="form-control form-control--minimal mb-2 charactermancer__class-search" placeholder="Filter by name...">
-			<div class="charactermancer__class-list" id="charactermancer-class-list"></div>
+		const wrp = ee`<div class="ve-flex-col charactermancer__step-class min-h-0">
+			<div class="ve-flex-v-center mb-2">
+				<button class="ve-btn ve-btn-default ve-btn-sm mr-2 charactermancer__back-btn">← Back to Basics</button>
+				<h4 class="mb-0 mr-2">Choose your class and subclass</h4>
+				<div class="ve-flex-1"></div>
+				<button class="ve-btn ve-btn-primary ve-btn-sm charactermancer__class-confirm-btn" disabled>Confirm Selection →</button>
+			</div>
+			<p class="ve-muted mb-3">Select a class from the list, then review its progression and subclass options.</p>
+			<div class="ve-flex flex-1 min-h-0 charactermancer__class-viewer"></div>
 		</div>`;
 
-		wrp.find(".charactermancer__back-btn").onn("click", () => this._setStep(0));
+		const $btnBack = wrp.find(".charactermancer__back-btn");
+		const $btnConfirm = wrp.find(".charactermancer__class-confirm-btn");
+		const viewerRootEl = document.createElement("div");
+		viewerRootEl.className = "cmcls__viewer-root ve-flex-1 min-h-0 ve-flex-col";
+		wrp.find(".charactermancer__class-viewer").append(viewerRootEl);
 
-		const list = wrp.find("#charactermancer-class-list");
-		const searchIpt = wrp.find(".charactermancer__class-search");
-		const selectedClassName = this._state.class?.name || null;
-		this._classes.forEach(cls => {
-			const isSelected = cls.name === selectedClassName;
-			const btn = ee`<button class="ve-btn ${isSelected ? "ve-btn-primary charactermancer__class-btn--selected" : "ve-btn-default"} charactermancer__class-btn" data-class-name="${(cls.name || "").toLowerCase()}">${cls.name}</button>`
-				.onn("click", () => {
-					list.findAll(".charactermancer__class-btn").forEach(b => {
-						b.removeClass("ve-btn-primary").removeClass("charactermancer__class-btn--selected").addClass("ve-btn-default");
-					});
-					btn.removeClass("ve-btn-default").addClass("ve-btn-primary").addClass("charactermancer__class-btn--selected");
-					this._state.class = cls;
-					this._state.subclass = null;
-					this._setStep(2);
-				});
-			list.append(btn);
-		});
-		searchIpt.onn("input", () => {
-			const q = (searchIpt.val() || "").toLowerCase().trim();
-			wrp.findAll(".charactermancer__class-btn").forEach(btn => {
-				const name = btn.attr("data-class-name") || "";
-				btn.toggleClass("hidden", q && !name.includes(q));
-			});
+		$btnBack.onn("click", () => this._setStep(0));
+		$btnConfirm.onn("click", () => {
+			if (!this._state.class) {
+				JqueryUtil.doToast({ content: "Please select a class first.", type: "warning" });
+				return;
+			}
+			this._setStep(2);
 		});
 
 		this._$content.append(wrp);
-	}
 
-	_renderStepSubclass () {
-		if (!this._state.class) {
-			this._$content.html(`<p class="ve-muted">Please select a class first.</p><button class="ve-btn ve-btn-default" data-ix="1">Back to Class</button>`)
-				.find("button").onn("click", () => this._setStep(1));
-			return;
-		}
-
-		const subclasses = (this._state.class.subclasses || []).filter(sc => !sc._fMisc?.includes("Legacy"));
-
-		const wrp = ee`<div class="ve-flex-col">
-			<h4 class="mb-2">Choose your subclass</h4>
-			<p class="ve-muted mb-3">${this._state.class.name} — Select a subclass (or skip for now).</p>
-			<button class="ve-btn ve-btn-default ve-btn-sm mb-2 charactermancer__back-btn">← Back to Class</button>
-			<div class="ve-flex flex-wrap gap-2" id="charactermancer-subclass-list"></div>
-			<button class="ve-btn ve-btn-default mt-3">Skip (no subclass yet)</button>
-		</div>`;
-
-		wrp.find(".charactermancer__back-btn").onn("click", () => this._setStep(1));
-
-		const list = wrp.find("#charactermancer-subclass-list");
-		const selectedScName = this._state.subclass?.shortName || null;
-		subclasses.forEach(sc => {
-			const isSelected = sc.shortName === selectedScName;
-			const btn = ee`<button class="ve-btn ${isSelected ? "ve-btn-primary" : "ve-btn-default"}">${sc.name}</button>`
-				.onn("click", () => {
-					list.findAll("button").forEach(b => b.removeClass("ve-btn-primary").addClass("ve-btn-default"));
-					btn.removeClass("ve-btn-default").addClass("ve-btn-primary");
-					this._state.subclass = sc;
-					this._setStep(3);
-				});
-			list.append(btn);
+		const { CharactermancerClassesEmbedded } = await import("./charactermancer/charactermancer-classes-embedded.js");
+		const emb = new CharactermancerClassesEmbedded({
+			wrpRoot: viewerRootEl,
+			onSelectionChange: ({ cls, subclassesActive }) => {
+				this._state.class = cls || null;
+				this._state.subclass = (subclassesActive && subclassesActive.length === 1) ? subclassesActive[0] : null;
+				this._updateSidebar();
+				$btnConfirm.prop("disabled", !this._state.class);
+			},
 		});
-
-		wrp.find("button.ve-btn-default.mt-3").onn("click", () => this._setStep(3));
-
-		this._$content.append(wrp);
+		await emb.pInit();
+		$btnConfirm.prop("disabled", !this._state.class);
 	}
 
 	_resolveEquipmentEntry (entry) {
@@ -536,7 +528,7 @@ class CharactermancerPage {
 					JqueryUtil.doToast({content: "Please select a class first.", type: "warning"});
 					return;
 				}
-				this._setStep(4);
+				this._setStep(3);
 			});
 		wrp.append(btnNext);
 		this._$content.append(wrp);
@@ -626,7 +618,7 @@ class CharactermancerPage {
 					JqueryUtil.doToast({content: "Please select a class first.", type: "warning"});
 					return;
 				}
-				this._setStep(5);
+				this._setStep(4);
 			});
 		wrp.append(btnNext);
 		this._$content.append(wrp);
@@ -965,7 +957,7 @@ class CharactermancerPage {
 					JqueryUtil.doToast({content: "Please select a class first.", type: "warning"});
 					return;
 				}
-				this._setStep(6);
+				this._setStep(5);
 			});
 		wrp.append(btnNext);
 		this._$content.append(wrp);

@@ -16,6 +16,24 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 This project is licensed under the terms of the MIT license.
 
+## Rodando Localmente
+
+1. Instalar dependências
+```bash
+npm install
+```
+2. Compilar o CSS (SCSS -> CSS)
+```bash
+npm run build:css
+```
+3. Subir o servidor local (porta 5050)
+```bash
+npm run serve:dev
+```
+4. Acessar no navegador: [http://localhost:5050](http://localhost:5050)
+
+> Para HTTPS na porta 5051, use `npm run serve:dev:tls`.
+
 ## Atualizando Fork
 
 - Configurar remote (apenas a primeira vez)

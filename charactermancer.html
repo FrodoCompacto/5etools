@@ -17,6 +17,7 @@
 	<link rel="stylesheet" href="css/fontawesome.css">
 	<link rel="stylesheet" href="css/main.css">
 	<link rel="stylesheet" href="css/charactermancer-bundle.css">
+	<link rel="stylesheet" href="css/classes.css">
 	<link rel="stylesheet" href="css/statgen-bundle.css">
 
 	<!-- Favicons -->
@@ -81,6 +82,13 @@
 	</nav>
 
 	<div class="container container--main h-100 min-h-0">
+		<div class="ve-flex-vh-center my-2">
+			<div class="ve-flex-v-center ve-btn-group" id="charactermancer-btngroup-manager">
+				<button type="button" class="ve-btn ve-btn-xs ve-btn-primary" name="manage-content">Manage Content</button>
+				<button type="button" class="ve-btn ve-btn-xs ve-btn-primary" name="manage-prerelease" title="Manage Prerelease Content"><span class="glyphicon glyphicon-wrench"></span></button>
+				<button type="button" class="ve-btn ve-btn-xs ve-btn-info" name="manage-brew" title="Manage Homebrew"><span class="glyphicon glyphicon-glass"></span></button>
+			</div>
+		</div>
 		<div class="ve-flex-col w-100 h-100 pt-2" id="charactermancer-main">
 			<div class="ve-flex-vh-center initial-message initial-message--large w-100 h-100">Loading...</div>
 		</div>
