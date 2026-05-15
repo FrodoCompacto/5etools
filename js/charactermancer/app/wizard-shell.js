@@ -47,13 +47,19 @@ export class WizardShell {
 		this._buildState.meta.lastTabId = this._activeTabId;
 	}
 
+	_updateDevPanel () {
+		if (!this._$root) return;
+		const pre = this._$root.find(".cmchr__dev-pre");
+		if (pre.length) pre.txt(JSON.stringify(this._buildState.serialize(), null, 2));
+	}
+
 	_updateFooterNav () {
 		if (!this._tabHost || !this._$btnPrev || !this._$btnNext) return;
 		this._$btnPrev.prop("disabled", !this._tabHost._hasPrevTab());
 		this._$btnNext.prop("disabled", !this._tabHost._hasNextTab());
 	}
 
-	render (parent) {
+	async render (parent) {
 		parent.empty();
 		parent.addClass("cmchr");
 		this._ensureActiveTabVisible();
@@ -63,6 +69,7 @@ export class WizardShell {
 		this._tabHost = new WizardTabHost({
 			visibleTabs,
 			buildState: this._buildState,
+			dataset: this._dataset,
 			getActiveTabId: () => this._activeTabId,
 			setActiveTabId: id => {
 				this._activeTabId = id;
@@ -101,20 +108,27 @@ export class WizardShell {
 
 		this._$btnPrev.onn("click", () => {
 			this._tabHost._doSwitchToPrevTab();
+			this._updateDevPanel();
 		});
 		this._$btnNext.onn("click", () => {
-			this._tabHost._doSwitchToNextTab();
+			if (!this._tabHost._trySwitchToNextTab()) return;
+			this._updateDevPanel();
 		});
 		this._$root.find(".cmchr__btn-finalize").onn("click", () => this._onFinalize());
 
-		this._tabHost.renderTabs({
+		await this._tabHost.pRenderTabs({
 			eleParent: wrpTabsMount,
 			onTabsReady: () => this._updateFooterNav(),
 		});
+
+		const classComponent = this._tabHost.getDomainComponent("class");
+		if (classComponent?.setDevStateUpdater) {
+			classComponent.setDevStateUpdater(() => this._updateDevPanel());
+		}
+
 		this._tabHost._addHook("meta", "ixActiveTab__default", () => this._updateFooterNav());
 
-		const pre = this._$root.find(".cmchr__dev-pre");
-		pre.txt(JSON.stringify(this._buildState.serialize(), null, 2));
+		this._updateDevPanel();
 
 		const counts = getDatasetCounts(this._dataset);
 		const countLines = Object.entries(counts)
@@ -127,6 +141,8 @@ export class WizardShell {
 	}
 
 	async _onFinalize () {
+		this._tabHost.syncActiveTabFormData();
+
 		const runner = new FinalizeRunner({
 			buildState: this._buildState,
 			dataset: this._dataset,

@@ -53,7 +53,7 @@ export class CharactermancerApp {
 				this._wizardShell.updateDataset(this._dataset);
 			}
 			this._$main.empty();
-			this._wizardShell.render(this._$main);
+			await this._wizardShell.render(this._$main);
 			this._bindManageContent();
 		} catch (err) {
 			console.error(err);

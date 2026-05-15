@@ -6,4 +6,12 @@
 			background: vars-night.$rgb-bg--alt-night;
 		}
 	}
+
+	.ve-night-mode .cmchr {
+		&__filter-bar .lst__search {
+			background: vars-night.$rgb-form-control-bg--night;
+			color: vars-night.$rgb-font--night;
+			border-color: vars-night.$rgb-border-grey--night;
+		}
+	}
 }

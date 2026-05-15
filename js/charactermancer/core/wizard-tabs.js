@@ -12,6 +12,7 @@ export const WIZARD_TABS = [
 		layout: "twoColumn",
 		selectTitle: "Select a Class",
 		headerMetaLabel: "Primary Class",
+		useGlobalListFilter: false,
 	},
 	{
 		id: "origin-background",

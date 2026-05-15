@@ -46,6 +46,7 @@
  * @property {WizardTabLayout} layout
  * @property {string} selectTitle
  * @property {string} [headerMetaLabel] Semantic label for entry meta badge (e.g. "Primary Class"); not rendered by DomainTabFrame.
+ * @property {boolean} [useGlobalListFilter] If false, omit list-page Filter/Search/Reset row (class tab uses inline controls).
  */
 
 /**
@@ -54,6 +55,23 @@
  * @property {HTMLElementExtended|null} wrpLeft
  * @property {HTMLElementExtended|null} wrpRight
  * @property {HTMLElementExtended|null} [wrpLeftMeta]
+ * @property {HTMLElementExtended|null} [wrpFilterBar]
+ * @property {boolean} [useGlobalListFilter]
+ * @property {(opts?: { onFilterClick?: () => void|Promise<void>, onResetClick?: () => void }) => void} [enableFilterChrome]
+ */
+
+/**
+ * @typedef {Object} DomainComponentValidateResult
+ * @property {boolean} isValid
+ * @property {string[]} messages
+ */
+
+/**
+ * @typedef {Object} DomainComponentFactoryContext
+ * @property {UnifiedDataset} dataset
+ * @property {import("../state/character-build-state.js").CharacterBuildState} buildState
+ * @property {WizardTabDefinition} tab
+ * @property {DomainTabFrameMount} frameMount
  */
 
 /**

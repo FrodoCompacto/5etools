@@ -402,6 +402,10 @@ class _PageGeneratorCharactermancer extends PageGeneratorGeneric {
 		"charactermancer-bundle",
 	];
 
+	_scriptsUtilsAdditional = [
+		"filter-classes.js",
+	];
+
 	_scriptsModules = [
 		"charactermancer.js",
 	];

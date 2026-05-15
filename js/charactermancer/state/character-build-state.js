@@ -1,10 +1,11 @@
+import {getDefaultClassState, normalizeClassState} from "../core/class-build-state.js";
 import {BUILD_MODES, CHARACTERMANCER_STATE_VERSION} from "../core/constants.js";
 import {migrateCharacterBuildState} from "./character-build-state-migrate.js";
 
 export class CharacterBuildState {
 	constructor () {
 		this.stateVersion = CHARACTERMANCER_STATE_VERSION;
-		this.classState = {};
+		this.classState = getDefaultClassState();
 		this.backgroundState = {};
 		this.speciesState = {};
 		this.originOtherState = {};
@@ -40,7 +41,7 @@ export class CharacterBuildState {
 		if (!migrated) return state;
 
 		if (migrated.stateVersion != null) state.stateVersion = migrated.stateVersion;
-		state.classState = migrated.classState || {};
+		state.classState = normalizeClassState(migrated.classState);
 		state.backgroundState = migrated.backgroundState || {};
 		state.speciesState = migrated.speciesState || {};
 		state.originOtherState = migrated.originOtherState || {};

@@ -1,3 +1,4 @@
+import {normalizeClassState} from "../core/class-build-state.js";
 import {BUILD_MODES, CHARACTERMANCER_STATE_VERSION} from "../core/constants.js";
 
 /**
@@ -34,6 +35,8 @@ export function migrateCharacterBuildState (data) {
 
 	if (!migrated.meta) migrated.meta = {};
 	if (migrated.meta.buildMode == null) migrated.meta.buildMode = BUILD_MODES.NEW_CHARACTER;
+
+	migrated.classState = normalizeClassState(migrated.classState);
 
 	return migrated;
 }
