@@ -395,22 +395,11 @@ class _PageGeneratorCharactermancer extends PageGeneratorGeneric {
 	_page = "charactermancer.html";
 
 	_pageTitle = "Charactermancer";
-	_navbarDescription = "Step-by-step character creation wizard.";
+	_navbarDescription = "Character creation (architectural rebuild).";
 
 	_isFontAwesome = true;
 	_stylesheets = [
 		"charactermancer-bundle",
-		"statgen-bundle",
-	];
-
-	_scriptsUtilsAdditional = [
-		"filter-common.js",
-		"filter-races.js",
-		"filter-backgrounds.js",
-		"filter-feats.js",
-		"filter-classes.js",
-		"filter-spells.js",
-		"filter-items.js",
 	];
 
 	_scriptsModules = [

@@ -147,4 +147,89 @@
 			flex-wrap: wrap;
 		}
 	}
+
+	// Architectural rebuild shell (cmchr__) — Plutonium-like wizard layout
+	.cmchr {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-height: 0;
+		width: 100%;
+
+		&__shell {
+			flex: 1;
+			min-height: 0;
+			display: flex;
+			flex-direction: column;
+		}
+
+		&__tabs-mount,
+		&__tabs-inner {
+			flex: 1;
+			min-height: 0;
+			display: flex;
+			flex-direction: column;
+		}
+
+		&__tab-bodies {
+			flex: 1;
+			min-height: 0;
+			display: flex;
+			flex-direction: column;
+		}
+
+		&__tab-panel {
+			flex: 1;
+			min-height: 0;
+		}
+
+		&__footer {
+			flex-shrink: 0;
+		}
+
+		&__dev-details {
+			flex-shrink: 0;
+		}
+
+		&__col-wrapper {
+			flex: 1;
+			min-height: 0;
+			align-items: stretch;
+		}
+
+		&__left-col {
+			flex: 0 0 38%;
+			max-width: 420px;
+			min-width: 220px;
+		}
+
+		&__right-col {
+			flex: 1 1 auto;
+			min-width: 0;
+			overflow-y: auto;
+			background: vars.$rgb-bg;
+			border: 1px solid vars.$rgb-border-grey--trans;
+			border-top: 0;
+		}
+
+		&__domain-header {
+			flex-shrink: 0;
+		}
+
+		&__filter-bar {
+			flex-shrink: 0;
+			font-size: 0.85rem;
+		}
+
+		&__left-body {
+			min-height: 120px;
+		}
+
+		&__domain--single {
+			.cmchr__single-body {
+				flex: 1;
+				min-height: 0;
+			}
+		}
+	}
 }
