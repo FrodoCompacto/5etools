@@ -60,7 +60,7 @@ export class WizardTabHost extends BaseComponent {
 			this._tabMetasOut.push({tab, btnTab, wrpTab});
 		});
 
-		const wrpHeads = ee`<div class="ve-flex w-100 no-shrink ui-tab__wrp-tab-heads--border"></div>`;
+		const wrpHeads = ee`<div class="cmchr__tab-heads ve-flex w-100 no-shrink ui-tab__wrp-tab-heads--border"></div>`;
 		this._tabMetasOut.forEach(it => wrpHeads.append(it.btnTab));
 
 		const wrpBodies = ee`<div class="cmchr__tab-bodies ve-flex-col flex-1 min-h-0 w-100"></div>`;

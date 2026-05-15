@@ -45,14 +45,15 @@
  * @property {string} [domainComponentId]
  * @property {WizardTabLayout} layout
  * @property {string} selectTitle
- * @property {string} [headerMetaLabel]
+ * @property {string} [headerMetaLabel] Semantic label for entry meta badge (e.g. "Primary Class"); not rendered by DomainTabFrame.
  */
 
 /**
  * @typedef {Object} DomainTabFrameMount
+ * @property {HTMLElementExtended} wrpRoot
  * @property {HTMLElementExtended|null} wrpLeft
  * @property {HTMLElementExtended|null} wrpRight
- * @property {HTMLElementExtended} wrpRoot
+ * @property {HTMLElementExtended|null} [wrpLeftMeta]
  */
 
 /**

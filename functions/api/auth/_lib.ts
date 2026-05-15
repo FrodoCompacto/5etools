@@ -11,6 +11,7 @@ export interface Env {
 }
 
 const COOKIE_NAME = "session";
+export const SESSION_HINT_COOKIE = "session_hint";
 const JWT_ISSUER = "5etools-auth";
 const JWT_AUDIENCE = "5etools";
 const JWT_EXPIRY_SEC = 7 * 24 * 60 * 60; // 7 days
@@ -55,6 +56,15 @@ export function setSessionCookie(jwt: string, maxAgeSec: number = JWT_EXPIRY_SEC
 
 export function clearSessionCookie(): string {
 	return `${COOKIE_NAME}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`;
+}
+
+/** Non-HttpOnly hint so the client can skip /api/auth/me when absent. */
+export function setSessionHintCookie(maxAgeSec: number = JWT_EXPIRY_SEC): string {
+	return `${SESSION_HINT_COOKIE}=1; Path=/; Secure; SameSite=Lax; Max-Age=${maxAgeSec}`;
+}
+
+export function clearSessionHintCookie(): string {
+	return `${SESSION_HINT_COOKIE}=; Path=/; Secure; SameSite=Lax; Max-Age=0`;
 }
 
 /** Generate state param for OAuth: base64url(nonce).base64url(hmac). */

@@ -181,39 +181,81 @@
 		&__tab-panel {
 			flex: 1;
 			min-height: 0;
+			padding: 0;
+		}
+
+		&__domain--two-col {
+			flex: 1;
+			min-height: 0;
+		}
+
+		&__tab-heads {
+			flex-shrink: 0;
+			overflow-x: auto;
+			overflow-y: hidden;
+			flex-wrap: nowrap;
+
+			.ui-tab__btn-tab-head {
+				flex-shrink: 0;
+			}
 		}
 
 		&__footer {
 			flex-shrink: 0;
 		}
 
+		&__footer-manage {
+			flex-shrink: 0;
+		}
+
+		&__footer-nav {
+			flex-shrink: 0;
+			margin-left: auto;
+		}
+
 		&__dev-details {
 			flex-shrink: 0;
 		}
 
-		&__col-wrapper {
+		&__split-panel {
 			flex: 1;
 			min-height: 0;
+			display: flex;
 			align-items: stretch;
 		}
 
-		&__left-col {
+		&__lhs {
 			flex: 0 0 38%;
 			max-width: 420px;
 			min-width: 220px;
+			min-height: 0;
+			overflow: hidden;
+			border-right: 1px solid vars.$rgb-border-grey--trans;
 		}
 
-		&__right-col {
+		&__lhs-chrome {
+			flex-shrink: 0;
+		}
+
+		&__lhs-title {
+			min-width: 0;
+		}
+
+		&__lhs-meta {
+			flex-shrink: 0;
+			gap: 0.35rem;
+		}
+
+		&__rhs {
 			flex: 1 1 auto;
 			min-width: 0;
-			overflow-y: auto;
-			background: vars.$rgb-bg;
-			border: 1px solid vars.$rgb-border-grey--trans;
-			border-top: 0;
+			min-height: 0;
+			overflow: hidden;
 		}
 
-		&__domain-header {
-			flex-shrink: 0;
+		&__preview-pane {
+			flex: 1;
+			min-height: 0;
 		}
 
 		&__filter-bar {
@@ -221,8 +263,32 @@
 			font-size: 0.85rem;
 		}
 
-		&__left-body {
-			min-height: 120px;
+		&__lhs-body {
+			min-height: 0;
+			overflow-y: auto;
+		}
+
+		&__entry {
+			&-head {
+				flex-shrink: 0;
+				min-height: 1.75rem;
+			}
+
+			&-meta {
+				flex-shrink: 0;
+				gap: 0.35rem;
+			}
+
+			&-body {
+				min-height: 0;
+			}
+		}
+
+		&__btn-entry-collapse {
+			flex-shrink: 0;
+			min-width: 2rem;
+			padding-left: 0.35rem;
+			padding-right: 0.35rem;
 		}
 
 		&__domain--single {

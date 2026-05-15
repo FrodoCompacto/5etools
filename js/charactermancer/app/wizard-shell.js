@@ -73,13 +73,20 @@ export class WizardShell {
 		this._$root = ee`<div class="cmchr__shell ve-flex-col w-100 h-100 min-h-0">
 			<div class="cmchr__tabs-mount ve-flex-col flex-1 min-h-0 w-100"></div>
 			<hr class="ve-hr-1 ve-w-100 my-2">
-			<div class="cmchr__footer ve-flex-v-center ve-flex-h-right ve-pr-3 pb-2">
-				<div class="ve-flex-v-center ve-btn-group">
-					<button type="button" class="ve-btn ve-btn-5et ve-btn-default ve-w-100p cmchr__btn-prev">Previous</button>
-					<button type="button" class="ve-btn ve-btn-5et ve-btn-default ve-w-100p cmchr__btn-next">Next</button>
+			<div class="cmchr__footer ve-flex-v-center w-100 ve-px-3 pb-2">
+				<div class="ve-flex-v-center ve-btn-group cmchr__footer-manage" id="charactermancer-btngroup-manager">
+					<button type="button" class="ve-btn ve-btn-xs ve-btn-primary" name="manage-content">Manage Content</button>
+					<button type="button" class="ve-btn ve-btn-xs ve-btn-primary" name="manage-prerelease" title="Manage Prerelease Content"><span class="glyphicon glyphicon-wrench"></span></button>
+					<button type="button" class="ve-btn ve-btn-xs ve-btn-info" name="manage-brew" title="Manage Homebrew"><span class="glyphicon glyphicon-glass"></span></button>
 				</div>
-				<div class="ve-vr-2 mx-2"></div>
-				<button type="button" class="ve-btn ve-btn-5et ve-btn-primary cmchr__btn-finalize">Finalize</button>
+				<div class="cmchr__footer-nav ve-flex-v-center ml-auto">
+					<div class="ve-flex-v-center ve-btn-group">
+						<button type="button" class="ve-btn ve-btn-5et ve-btn-default ve-w-100p cmchr__btn-prev">Previous</button>
+						<button type="button" class="ve-btn ve-btn-5et ve-btn-default ve-w-100p cmchr__btn-next">Next</button>
+					</div>
+					<div class="ve-vr-2 mx-2"></div>
+					<button type="button" class="ve-btn ve-btn-5et ve-btn-primary cmchr__btn-finalize">Finalize</button>
+				</div>
 			</div>
 			<details class="cmchr__dev-details ve-small ve-muted mt-1 mx-2">
 				<summary class="mb-1">Build state (dev)</summary>

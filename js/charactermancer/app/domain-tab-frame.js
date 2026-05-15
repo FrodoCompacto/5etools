@@ -36,7 +36,7 @@ export class DomainTabFrame {
 		const wrpBody = wrpRoot.find(".cmchr__single-body");
 		wrpBody.append(DomainTabFrame._getStubDevBlock({tab, buildState}));
 
-		return {wrpRoot, wrpLeft: null, wrpRight: wrpBody};
+		return {wrpRoot, wrpLeft: null, wrpRight: wrpBody, wrpLeftMeta: null};
 	}
 
 	/**
@@ -49,46 +49,72 @@ export class DomainTabFrame {
 	 */
 	static _renderTwoColumn ({parent, tab, buildState}) {
 		const wrpRoot = ee`<div class="cmchr__domain cmchr__domain--two-col ve-flex-col w-100 h-100 min-h-0">
-			<div class="cmchr__domain-header ve-flex-v-baseline mb-2 px-2 pt-2">
-				<h5 class="mb-0">${tab.selectTitle}</h5>
-			</div>
-			<div class="cmchr__col-wrapper ve-flex w-100 flex-1 min-h-0 px-2 pb-2">
-				<div class="cmchr__left-col ve-flex-col min-h-0 min-w-0">
-					<div class="cmchr__filter-bar"></div>
-					<div class="cmchr__left-body ve-flex-col flex-1 min-h-0 overflow-y-auto"></div>
+			<div class="cmchr__split-panel ve-flex flex-1 min-h-0 w-100">
+				<div class="cmchr__lhs ve-flex-col min-h-0 min-w-0">
+					<div class="cmchr__lhs-chrome ve-flex-v-baseline no-shrink px-2 pt-2">
+						<h5 class="cmchr__lhs-title mb-0">${tab.selectTitle}</h5>
+						<div class="cmchr__lhs-meta ml-auto ve-flex-v-center ve-hidden"></div>
+					</div>
+					<div class="cmchr__filter-bar px-2"></div>
+					<div class="cmchr__lhs-body ve-flex-col flex-1 min-h-0 overflow-y-auto px-2 pb-2"></div>
 				</div>
-				<div class="vr-2 h-100"></div>
-				<div class="cmchr__right-col ve-flex-col min-h-0 min-w-0 flex-1">
-					<div class="initial-message initial-message--med ve-flex-vh-center h-100">Select an entry from the list to view it here</div>
+				<div class="cmchr__rhs ve-flex-col flex-1 min-h-0 min-w-0">
+					<div class="cmchr__preview-pane ve-flex-col flex-1 min-h-0 overflow-y-auto">
+						<div class="initial-message initial-message--med ve-flex-vh-center flex-1 min-h-0">Select an entry from the list to view it here</div>
+					</div>
 				</div>
 			</div>
 		</div>`;
 
-		if (tab.headerMetaLabel) {
-			wrpRoot.find(".cmchr__domain-header").append(
-				ee`<span class="cmchr__domain-header-meta ve-muted ve-small ml-auto">${tab.headerMetaLabel} [—]</span>`,
-			);
-		}
-
+		const searchPlaceholder = DomainTabFrame._getSearchPlaceholder(tab);
 		const wrpFilter = wrpRoot.find(".cmchr__filter-bar");
 		wrpFilter.append(
-			ee`<div class="input-group input-group--bottom ve-flex-v-center mb-2">
-				<span class="input-group-addon ve-flex-vh-center"><span class="glyphicon glyphicon-filter"></span> Filter</span>
-				<input type="search" class="form-control" placeholder="Filter..." disabled>
-				<span class="input-group-btn">
-					<button type="button" class="ve-btn ve-btn-default" disabled><span class="glyphicon glyphicon-chevron-down"></span></button>
-				</span>
-			</div>`,
+			ee`<div class="ve-flex-v-stretch input-group input-group--top no-shrink mb-1">
+				<button type="button" class="ve-btn ve-btn-5et veapp__btn-filter" disabled>Filter</button>
+				<div class="w-100 relative">
+					<input type="search" autocomplete="off" autocapitalize="off" spellcheck="false" class="h-100 search form-control lst__search lst__search--no-border-h" placeholder="${searchPlaceholder}" disabled>
+					<div class="lst__wrp-search-glass no-events ve-flex-vh-center"><span class="glyphicon glyphicon-search"></span></div>
+				</div>
+				<button type="button" class="ve-btn ve-btn-5et veapp__btn-list-reset" disabled>Reset</button>
+			</div>
+			<div class="fltr__mini-view ve-btn-group mb-1"></div>`,
 		);
 
-		const wrpLeft = wrpRoot.find(".cmchr__left-body");
-		const wrpRight = wrpRoot.find(".cmchr__right-col");
+		const wrpLeft = wrpRoot.find(".cmchr__lhs-body");
+		const wrpRight = wrpRoot.find(".cmchr__preview-pane");
+		const wrpLeftMeta = wrpRoot.find(".cmchr__lhs-meta");
 
 		wrpLeft.append(DomainTabFrame._getStubDevBlock({tab, buildState, isCompact: true}));
 
+		if (tab.id === "class") {
+			DomainTabFrame._appendClassEntryWireframe({wrpLeft, headerMetaLabel: tab.headerMetaLabel});
+		}
+
 		parent.append(wrpRoot);
 
-		return {wrpRoot, wrpLeft, wrpRight};
+		return {wrpRoot, wrpLeft, wrpRight, wrpLeftMeta};
+	}
+
+	/**
+	 * @param {{
+	 *   wrpLeft: HTMLElementExtended,
+	 *   headerMetaLabel?: string,
+	 * }} opts
+	 */
+	static _appendClassEntryWireframe ({wrpLeft, headerMetaLabel}) {
+		const metaLabel = headerMetaLabel || "Primary Class";
+		wrpLeft.append(
+			ee`<div class="cmchr__entry cmchr__entry--wireframe ve-hidden" aria-hidden="true">
+				<div class="cmchr__entry-head ve-flex-v-center">
+					<span class="cmchr__entry-name"></span>
+					<div class="cmchr__entry-meta ml-auto ve-flex-v-center">
+						<span class="ve-muted ve-small cmchr__entry-meta-label">${metaLabel}</span>
+						<button type="button" class="ve-btn ve-btn-xs ve-btn-default cmchr__btn-entry-collapse ml-1" disabled title="Collapse">[−]</button>
+					</div>
+				</div>
+				<div class="cmchr__entry-body"></div>
+			</div>`,
+		);
 	}
 
 	/**
@@ -98,6 +124,11 @@ export class DomainTabFrame {
 	 *   isCompact?: boolean,
 	 * }} opts
 	 */
+	static _getSearchPlaceholder (tab) {
+		const title = tab.selectTitle || tab.label || "entries";
+		return `Find ${title.replace(/^Select (a |an )?/i, "")}...`;
+	}
+
 	static _getStubDevBlock ({tab, buildState, isCompact = false}) {
 		const stateSnapshot = tab.stateKey ? buildState[tab.stateKey] : null;
 		const inner = ee`<div class="cmchr__domain-stub ve-small ve-muted ${isCompact ? "p-1" : "p-2"}">

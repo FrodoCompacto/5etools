@@ -2,3 +2,25 @@
 
 @use "includes/charactermancer";
 @use "includes/charactermancer-night";
+
+@layer vetools {
+	@media screen and (width <= #{vars.$width-screen-md}) {
+		.viewport-wrapper {
+			bottom: 0;
+			height: 100vh;
+			min-height: 0;
+		}
+	}
+
+	.container--main {
+		min-width: 420px;
+	}
+
+	// Match .view-col spacing below site navbar (see style.scss)
+	.cmchr-page__view-col {
+		margin: 7px 7px 12px;
+		flex: 1;
+		min-height: 0;
+		height: calc(100% - 19px);
+	}
+}

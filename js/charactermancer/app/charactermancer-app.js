@@ -26,7 +26,6 @@ export class CharactermancerApp {
 		this._$main = es("#charactermancer-main");
 		if (!this._$main) throw new Error("Missing #charactermancer-main");
 
-		ManageBrewUi.bindBtngroupManager(e_({id: "charactermancer-btngroup-manager"}));
 		await this._pLoadDataset();
 
 		window.dispatchEvent(new Event("toolsLoaded"));
@@ -55,10 +54,17 @@ export class CharactermancerApp {
 			}
 			this._$main.empty();
 			this._wizardShell.render(this._$main);
+			this._bindManageContent();
 		} catch (err) {
 			console.error(err);
 			this._$main.html(`<div class="ve-flex-vh-center w-100 h-100 ve-danger">Failed to load content. See console.</div>`);
 			JqueryUtil.doToast({content: "Failed to load content!", type: "danger"});
 		}
+	}
+
+	_bindManageContent () {
+		const btngroup = e_({id: "charactermancer-btngroup-manager"});
+		if (!btngroup) return;
+		ManageBrewUi.bindBtngroupManager(btngroup);
 	}
 }

@@ -45,9 +45,14 @@ class NavBar {
 		NavBar._updateUserAuthButton();
 	}
 
+	static _hasSessionHint () {
+		return /(?:^|;\s*)session_hint=1(?:;|$)/.test(document.cookie);
+	}
+
 	static async _updateUserAuthButton () {
 		const el = document.querySelector("[data-nav=\"user-auth-action\"]");
 		if (!el) return;
+		if (!NavBar._hasSessionHint()) return;
 		try {
 			const res = await fetch("/api/auth/me", { credentials: "same-origin" });
 			if (!res.ok) return;
@@ -967,8 +972,7 @@ NavBar.InteractionManager = class {
 		evt.preventDefault();
 
 		try {
-			const meRes = await fetch("/api/auth/me", {credentials: "same-origin"});
-			if (!meRes.ok) {
+			if (!NavBar._hasSessionHint()) {
 				JqueryUtil.doToast({type: "warning", content: `You must be logged in to save user configuration.`});
 				return;
 			}
@@ -985,6 +989,10 @@ NavBar.InteractionManager = class {
 				body: JSON.stringify(dump),
 			});
 
+			if (res.status === 401) {
+				JqueryUtil.doToast({type: "warning", content: `You must be logged in to save user configuration.`});
+				return;
+			}
 			if (!res.ok) {
 				JqueryUtil.doToast({type: "danger", content: `Failed to save user configuration. ${VeCt.STR_SEE_CONSOLE}`});
 				return;
@@ -1001,13 +1009,16 @@ NavBar.InteractionManager = class {
 		evt.preventDefault();
 
 		try {
-			const meRes = await fetch("/api/auth/me", {credentials: "same-origin"});
-			if (!meRes.ok) {
+			if (!NavBar._hasSessionHint()) {
 				JqueryUtil.doToast({type: "warning", content: `You must be logged in to load user configuration.`});
 				return;
 			}
 
 			const res = await fetch("/api/user/state", {credentials: "same-origin"});
+			if (res.status === 401) {
+				JqueryUtil.doToast({type: "warning", content: `You must be logged in to load user configuration.`});
+				return;
+			}
 			if (!res.ok) {
 				JqueryUtil.doToast({type: "danger", content: `Failed to load user configuration. ${VeCt.STR_SEE_CONSOLE}`});
 				return;

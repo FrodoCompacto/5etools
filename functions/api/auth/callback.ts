@@ -1,5 +1,5 @@
 import type { Env } from "./_lib";
-import { verifyState, encodeJwt, setSessionCookie } from "./_lib";
+import { verifyState, encodeJwt, setSessionCookie, setSessionHintCookie } from "./_lib";
 
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo";
@@ -62,13 +62,12 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 		return Response.redirect(new URL("/", url.origin).toString(), 302);
 	}
 	const jwt = await encodeJwt(SESSION_SECRET, userId);
-	const cookie = setSessionCookie(jwt);
 	const home = new URL("/", url.origin).toString();
+	const headers = new Headers({ Location: home });
+	headers.append("Set-Cookie", setSessionCookie(jwt));
+	headers.append("Set-Cookie", setSessionHintCookie());
 	return new Response(null, {
 		status: 302,
-		headers: {
-			Location: home,
-			"Set-Cookie": cookie,
-		},
+		headers,
 	});
 };
