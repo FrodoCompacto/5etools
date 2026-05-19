@@ -36,10 +36,9 @@ export class ClassPreviewRenderer {
 		if (!ent) return;
 
 		const isSubclass = !!ent.className;
-		const fluff = await DataUtil.generic.pGetFluff({
-			entity: ent,
-			fluffProp: isSubclass ? "subclassFluff" : "classFluff",
-		});
+		const fluff = isSubclass
+			? await Renderer.subclass.pGetFluff(ent)
+			: await Renderer.class.pGetFluff(ent);
 
 		if (!fluff?.images?.length) return;
 

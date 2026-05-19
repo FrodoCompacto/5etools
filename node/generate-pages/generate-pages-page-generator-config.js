@@ -395,7 +395,7 @@ class _PageGeneratorCharactermancer extends PageGeneratorGeneric {
 	_page = "charactermancer.html";
 
 	_pageTitle = "Charactermancer";
-	_navbarDescription = "Character creation (architectural rebuild).";
+	_navbarDescription = "Character creation.";
 
 	_isFontAwesome = true;
 	_stylesheets = [

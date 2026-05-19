@@ -67,10 +67,10 @@ export class DomainTabFrame {
 						<div class="cmchr__lhs-meta ml-auto ve-flex-v-center ve-hidden"></div>
 					</div>
 					<div class="cmchr__filter-bar px-2 ${useGlobalListFilter ? "" : "cmchr__filter-bar--mini-only"}"></div>
-					<div class="cmchr__lhs-body ve-flex-col flex-1 min-h-0 overflow-y-auto px-2 pb-2"></div>
+					<div class="cmchr__lhs-body ve-flex-col flex-1 min-h-0 px-2 pb-2"></div>
 				</div>
 				<div class="cmchr__rhs ve-flex-col flex-1 min-h-0 min-w-0">
-					<div class="cmchr__preview-pane ve-flex-col flex-1 min-h-0 overflow-y-auto">
+					<div class="cmchr__preview-pane flex-1 min-h-0 overflow-y-auto smooth-scroll">
 						<div class="initial-message initial-message--med ve-flex-vh-center flex-1 min-h-0">Select an entry from the list to view it here</div>
 					</div>
 				</div>

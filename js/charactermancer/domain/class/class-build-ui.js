@@ -6,6 +6,7 @@ import {
 	resolveClassFromDataset,
 	resolveSubclassFromClass,
 } from "../../core/class-build-state.js";
+import {getClassSkillProficiencyPlan} from "./class-skill-prof-plan.js";
 import {ClassPreviewRenderer} from "./class-preview-renderer.js";
 
 export class ClassBuildUi extends BaseComponent {
@@ -44,6 +45,11 @@ export class ClassBuildUi extends BaseComponent {
 		this._isFilterReady = false;
 		/** @type {HTMLElementExtended|null} */
 		this._wrpEntryBody = null;
+		/** @type {HTMLElementExtended|null} */
+		this._wrpDetailsScroll = null;
+
+		this._snapIxClassForSkills = undefined;
+		this._snapIxSubclassForSkills = undefined;
 	}
 
 	/**
@@ -143,7 +149,7 @@ export class ClassBuildUi extends BaseComponent {
 
 		this._notifyChange();
 		this._renderPreview();
-		this._renderDetailSections({wrpEntryBody: this._wrpEntryBody});
+		this._renderDetailSections({wrpDetailsScroll: this._wrpDetailsScroll});
 	}
 
 	render () {
@@ -155,10 +161,14 @@ export class ClassBuildUi extends BaseComponent {
 		const metaLabel = this._headerMetaLabel;
 		const btnPrimaryMeta = ee`<button type="button" class="ve-btn ve-btn-default ve-btn-xs ve-mr-2" title="This is your primary class, i.e. the one you chose at level 1 for the purposes of proficiencies/etc." disabled>${metaLabel}</button>`;
 		const btnCollapse = ee`<button type="button" class="ve-btn ve-btn-xs ve-btn-default cmchr__btn-entry-collapse ve-clickable ve-muted" title="Collapse">[\u2212]</button>`;
-		const wrpEntryBody = ee`<div class="cmchr__entry-body ve-flex-col ve-mt-2"></div>`;
+		const wrpEntryBody = ee`<div class="cmchr__entry-body ve-flex-col ve-mt-2 flex-1 min-h-0"></div>`;
+		const wrpSelBlock = ee`<div class="cmchr__entry-sel-block flex-shrink-0"></div>`;
+		const wrpDetailsScroll = ee`<div class="cmchr__entry-details-scroll ve-flex-col flex-1 min-h-0"></div>`;
+		wrpEntryBody.append(wrpSelBlock, wrpDetailsScroll);
 		this._wrpEntryBody = wrpEntryBody;
+		this._wrpDetailsScroll = wrpDetailsScroll;
 
-		const wrpEntry = ee`<div class="cmchr__entry">
+		const wrpEntry = ee`<div class="cmchr__entry ve-flex-col flex-1 min-h-0">
 			<div class="cmchr__entry-head split-v-center">
 				<div class="ve-bold mb-0">Select a Class</div>
 				<div class="ve-flex-v-center">
@@ -169,7 +179,13 @@ export class ClassBuildUi extends BaseComponent {
 			${wrpEntryBody}
 		</div>`;
 
+		const btnAddClass = ee`<button type="button" class="ve-btn ve-btn-default ve-btn-xs mt-2" disabled title="Multiclass is not implemented yet.">Add Another Class</button>`;
+
+		mount.wrpLeft.addClass("ve-flex-col", "flex-1", "min-h-0");
 		mount.wrpLeft.append(wrpEntry);
+		mount.wrpLeft.append(btnAddClass);
+
+		this._renderSelectionControls({wrpSelBlock});
 
 		const hkCollapse = () => {
 			wrpEntryBody.toggleVe(!this._state.isCollapsed);
@@ -182,7 +198,6 @@ export class ClassBuildUi extends BaseComponent {
 			this._state.isCollapsed = !this._state.isCollapsed;
 		});
 
-		this._renderSelectionControls({wrpEntryBody});
 		this._restoreSelectionFromEntry();
 		this._syncEntryFromState();
 
@@ -237,9 +252,9 @@ export class ClassBuildUi extends BaseComponent {
 		}
 	}
 
-	_renderSelectionControls ({wrpEntryBody}) {
+	_renderSelectionControls ({wrpSelBlock}) {
 		const wrpSel = ee`<div class="cmchr__class-sel ve-flex-col ve-w-100"></div>`;
-		wrpEntryBody.append(wrpSel);
+		wrpSelBlock.append(wrpSel);
 
 		const {wrp: wrpClassSel, setFnFilter: setFnFilterClass} = ComponentUiUtil.getSelSearchable(
 			this,
@@ -276,18 +291,26 @@ export class ClassBuildUi extends BaseComponent {
 		const hkSubclassValues = () => {
 			const cls = this._state.ixClass != null ? this._classes[this._state.ixClass] : null;
 			const values = cls?.subclasses?.length ? cls.subclasses.map((_, i) => i) : [];
-			this._setValuesSubclass(values);
+			this._setValuesSubclass(values, {isResetOnMissing: true});
 			wrpSubclassRow.toggleVe(!!values.length);
-			if (this._state.ixSubclass != null && !values.includes(this._state.ixSubclass)) {
-				this._state.ixSubclass = null;
-			}
 		};
 
 		this._addHookBase("ixClass", () => {
+			if (this._snapIxClassForSkills != null && this._snapIxClassForSkills !== this._state.ixClass) {
+				this._getEntry().skillProficiencyChoices = [];
+				this._state.ixSubclass = null;
+			}
+			this._snapIxClassForSkills = this._state.ixClass;
 			hkSubclassValues();
 			this._syncEntryFromState();
 		});
-		this._addHookBase("ixSubclass", () => this._syncEntryFromState());
+		this._addHookBase("ixSubclass", () => {
+			if (this._snapIxSubclassForSkills != null && this._snapIxSubclassForSkills !== this._state.ixSubclass) {
+				this._getEntry().skillProficiencyChoices = [];
+			}
+			this._snapIxSubclassForSkills = this._state.ixSubclass;
+			this._syncEntryFromState();
+		});
 		this._addHookBase("hpIncreaseMode", () => {
 			this._getEntry().hpIncreaseMode = this._state.hpIncreaseMode;
 			this._notifyChange();
@@ -340,16 +363,16 @@ export class ClassBuildUi extends BaseComponent {
 		this._setValuesSubclass?.(this._getActiveClass()?.subclasses?.map((_, i) => i) ?? []);
 	}
 
-	_renderDetailSections ({wrpEntryBody} = {}) {
-		if (!wrpEntryBody) {
-			wrpEntryBody = this._frameMount.wrpLeft?.find(".cmchr__entry-body");
+	_renderDetailSections ({wrpDetailsScroll} = {}) {
+		if (!wrpDetailsScroll) {
+			wrpDetailsScroll = this._wrpDetailsScroll || this._frameMount.wrpLeft?.find(".cmchr__entry-details-scroll");
 		}
-		if (!wrpEntryBody) return;
+		if (!wrpDetailsScroll) return;
 
-		let stgDetails = wrpEntryBody.find(".cmchr__class-details");
+		let stgDetails = wrpDetailsScroll.find(".cmchr__class-details");
 		if (!stgDetails) {
 			stgDetails = ee`<div class="cmchr__class-details ve-flex-col"></div>`;
-			wrpEntryBody.append(stgDetails);
+			wrpDetailsScroll.append(stgDetails);
 		} else {
 			stgDetails.empty();
 		}
@@ -395,48 +418,202 @@ export class ClassBuildUi extends BaseComponent {
 			${wrpSkillProfs}`,
 		);
 
-		ClassBuildUi._renderHpSummary({wrpHpSummary, cls});
-		ClassBuildUi._renderSavingThrows({wrpSaveProfs, cls});
-		ClassBuildUi._renderSkillProficiencies({wrpSkillProfs, cls});
+		ClassBuildUi._renderHpSummaryPlutoniumStyle({wrpHpSummary, cls});
+		ClassBuildUi._renderSavingThrowsPlutoniumStyle({wrpSaveProfs, cls});
+		this._renderSkillProficiencyPickList({wrpSkillProfs, cls, sc: this._getActiveSubclass()});
 	}
 
-	static _renderHpSummary ({wrpHpSummary, cls}) {
+	static _renderHpSummaryPlutoniumStyle ({wrpHpSummary, cls}) {
 		wrpHpSummary.empty();
+		wrpHpSummary.addClass("ve-flex-col", "ve-min-h-0", "ve-small");
+
+		if (!cls?.hd) {
+			wrpHpSummary.append(ee`<p class="ve-muted mb-0">\u2014</p>`);
+			return;
+		}
+
 		try {
-			const html = Renderer?.class?.getHtmlPtHitPoints(cls);
-			if (!html) {
-				wrpHpSummary.append(ee`<p class="ve-muted mb-0">\u2014</p>`);
-				return;
+			const renderer = Renderer.get();
+			const hdEntry = Renderer.class.getHitDiceEntry(cls.hd);
+			const hdHtml = hdEntry ? renderer.render(hdEntry) : `\u2014`;
+			const hp1 = Renderer.class.getHitPointsAtFirstLevel(cls.hd) || "\u2014";
+			const hpHi = Renderer.class.getHitPointsAtHigherLevels(cls.name, cls.hd) || "";
+
+			const rowDice = ee`<div class="ve-block ve-flex-v-center flex-wrap"></div>`;
+			rowDice.append(ee`<div class="ve-inline-block ve-bold ve-mr-1">Hit Dice:</div>`);
+			rowDice.append(ee`<span></span>`.html(hdHtml));
+			wrpHpSummary.append(rowDice);
+
+			const rowHp1 = ee`<div class="ve-block"></div>`;
+			rowHp1.append(ee`<div class="ve-inline-block ve-bold ve-mr-1">Hit Points:</div>`);
+			rowHp1.append(document.createTextNode(String(hp1)));
+			wrpHpSummary.append(rowHp1);
+
+			if (hpHi) {
+				const rowHi = ee`<div class="ve-block ve-flex-v-center flex-wrap"></div>`;
+				rowHi.append(ee`<div class="ve-inline-block ve-bold ve-mr-1">Hit Points at Higher Levels:</div>`);
+				rowHi.append(ee`<span></span>`.html(hpHi));
+				wrpHpSummary.append(rowHi);
 			}
-			wrpHpSummary.html(html);
 		} catch (err) {
 			console.error(err);
 			wrpHpSummary.append(ee`<p class="ve-muted mb-0">\u2014</p>`);
 		}
 	}
 
-	static _renderSavingThrows ({wrpSaveProfs, cls}) {
+	static _renderSavingThrowsPlutoniumStyle ({wrpSaveProfs, cls}) {
 		wrpSaveProfs.empty();
-		try {
-			const html = Renderer?.class?.getHtmlPtSavingThrows(cls);
-			if (html) wrpSaveProfs.html(html);
-			else wrpSaveProfs.append(ee`<p class="ve-muted mb-0">\u2014</p>`);
-		} catch (err) {
-			console.error(err);
+		wrpSaveProfs.addClass("ve-flex-col", "ve-overflow-y-auto");
+
+		if (!cls?.proficiency?.length) {
 			wrpSaveProfs.append(ee`<p class="ve-muted mb-0">\u2014</p>`);
+			return;
 		}
+
+		const line = cls.proficiency.map(abv => Parser.attAbvToFull(abv)).join(", ");
+		wrpSaveProfs.append(ee`<div class="ve-block">${line}</div>`);
 	}
 
-	static _renderSkillProficiencies ({wrpSkillProfs, cls}) {
+	/**
+	 * @param {{
+	 *   wrpSkillProfs: HTMLElementExtended,
+	 *   cls: object,
+	 *   sc: object|null,
+	 * }} opts
+	 */
+	_renderSkillProficiencyPickList ({wrpSkillProfs, cls, sc}) {
 		wrpSkillProfs.empty();
-		try {
-			const html = Renderer?.class?.getHtmlPtSkills(cls);
-			if (html) wrpSkillProfs.html(html);
-			else wrpSkillProfs.append(ee`<p class="ve-muted mb-0">\u2014</p>`);
-		} catch (err) {
-			console.error(err);
-			wrpSkillProfs.append(ee`<p class="ve-muted mb-0">\u2014</p>`);
+		wrpSkillProfs.addClass("ve-flex-col");
+
+		const plan = getClassSkillProficiencyPlan(cls, sc);
+		if (!plan?.pool?.length && !plan?.granted?.length && !plan?.chooseCount) {
+			try {
+				const html = Renderer?.class?.getHtmlPtSkills(cls);
+				if (html) wrpSkillProfs.html(html);
+				else wrpSkillProfs.append(ee`<p class="ve-muted mb-0">\u2014</p>`);
+			} catch {
+				wrpSkillProfs.append(ee`<p class="ve-muted mb-0">\u2014</p>`);
+			}
+			return;
 		}
+
+		const entry = this._getEntry();
+		entry.skillProficiencyChoices = [...new Set(entry.skillProficiencyChoices || [])];
+		const extArr = this._getBackgroundGrantedSkillKeys();
+		const ext = new Set(extArr);
+		ClassBuildUi._sanitizeSkillChoices(entry, plan, ext);
+
+		if (plan.chooseCount > 0) {
+			const n = plan.chooseCount;
+			const noun = n === 1 ? "Skill Proficiency" : "Skill Proficiencies";
+			wrpSkillProfs.append(ee`<div class="ve-mb-1">Choose ${n} ${noun}:</div>`);
+		}
+		const granted = new Set(plan.granted);
+		const pool = new Set(plan.pool);
+
+		/** Display order: pool skills sorted, optional granted-not-in-pool after */
+		const ordered = [...pool].sort(SortUtil.ascSortLower);
+
+		const wrpList = ee`<div class="cmchr__skill-pick-list ve-flex-col ve-w-100 ve-overflow-y-auto ve-min-h-40p ve-no-shrink"></div>`;
+
+		const paint = () => {
+			ClassBuildUi._sanitizeSkillChoices(entry, plan, ext);
+			const chosen = entry.skillProficiencyChoices;
+			const classPickCount = chosen.filter(sk => pool.has(sk) && !granted.has(sk) && !ext.has(sk)).length;
+
+			wrpList.empty();
+			for (const skillKey of ordered) {
+				const isExt = ext.has(skillKey);
+				const isGrant = granted.has(skillKey);
+				const inPool = pool.has(skillKey);
+				const picked = chosen.includes(skillKey) || isGrant;
+
+				const abvRaw = Parser.skillToAbilityAbv(skillKey) || "";
+				const abvShort = ClassBuildUi._abilityAbvToParenShort(abvRaw);
+
+				let dispName = "";
+				try {
+					dispName = Renderer.get().render(`{@skill ${ClassBuildUi._skillKeyToTitle(skillKey)}|PHB}`);
+				} catch {
+					dispName = ClassBuildUi._skillKeyToTitle(skillKey);
+				}
+
+				const cb = ee`<input type="checkbox">`;
+				cb.prop("checked", picked);
+
+				const atLimit = plan.chooseCount > 0 && classPickCount >= plan.chooseCount;
+				const canToggle = inPool && !isExt && !isGrant;
+				cb.prop("disabled", !canToggle || (atLimit && !picked));
+
+				cb.onn("change", () => {
+					const had = entry.skillProficiencyChoices.includes(skillKey);
+					const set = new Set(entry.skillProficiencyChoices);
+					if (cb.checked) {
+						if (canToggle && (!atLimit || had)) set.add(skillKey);
+					} else {
+						if (!isGrant) set.delete(skillKey);
+					}
+					entry.skillProficiencyChoices = [...set];
+					this._notifyChange();
+					paint();
+				});
+
+				const abilityTitle = Parser.attAbvToFull(abvRaw).qq();
+
+				const nameRow = ee`<div class="ve-flex-v-center"></div>`;
+				nameRow.append(ee`<span></span>`.html(dispName));
+				nameRow.append(ee`<div class="ve-ml-1 ve-small ve-muted" title="${abilityTitle}">(${abvShort})</div>`);
+
+				const rightCol = ee`<div class="ve-flex-v-center ve-w-100"></div>`;
+				rightCol.append(nameRow);
+				if (isExt) rightCol.append(ee`<span class="ve-small veapp__msg-warning ve-ml-1" title="Granted by your background or another origin">(\u2713)</span>`);
+
+				const row = ee`<label class="ve-flex-v-center ve-py-1 stripe-even cmchr__skill-pick-row">
+					<div class="ve-col-1 ve-flex-vh-center">${cb}</div>
+					<div class="ve-col-11 ve-flex-v-center">${rightCol}</div>
+				</label>`;
+				wrpList.append(row);
+			}
+		};
+
+		wrpSkillProfs.append(wrpList);
+		paint();
+	}
+
+	static _skillKeyToTitle (key) {
+		return key.split(/\s+/g).filter(Boolean).map(w => w.slice(0, 1).toUpperCase() + w.slice(1)).join(" ");
+	}
+
+	static _abilityAbvToParenShort (abvRaw) {
+		const m = {str: "Str", dex: "Dex", con: "Con", int: "Int", wis: "Wis", cha: "Cha"};
+		return m[abvRaw] || (abvRaw ? `${abvRaw.slice(0, 1).toUpperCase()}${abvRaw.slice(1, 3)}` : "");
+	}
+
+	static _sanitizeSkillChoices (entry, plan, backgroundKeys) {
+		const ext = backgroundKeys instanceof Set ? backgroundKeys : new Set(backgroundKeys || []);
+		const granted = new Set(plan.granted);
+		const pool = new Set(plan.pool);
+		entry.skillProficiencyChoices = (entry.skillProficiencyChoices || []).filter(sk =>
+			pool.has(sk) && !ext.has(sk) && !granted.has(sk));
+		let cap = Math.max(0, plan.chooseCount);
+		while (entry.skillProficiencyChoices.length > cap) entry.skillProficiencyChoices.pop();
+	}
+
+	_getBackgroundGrantedSkillKeys () {
+		const ref = this._buildState.backgroundState?.backgroundRef;
+		if (!ref?.name || !ref?.source || !this._dataset.background?.length) return [];
+
+		const bg = this._dataset.background.find(b => b.name === ref.name && b.source === ref.source);
+		if (!bg?.skillProficiencies?.length) return [];
+
+		const out = [];
+		for (const block of bg.skillProficiencies) {
+			if (!block || typeof block !== "object") continue;
+			for (const [k, v] of Object.entries(block)) {
+				if (v && Parser.SKILL_TO_ATB_ABV[k] != null) out.push(k);
+			}
+		}
+		return out;
 	}
 
 	_renderPreview () {
@@ -474,6 +651,18 @@ export class ClassBuildUi extends BaseComponent {
 		}
 
 		if ((entry.targetLevel || 0) < 1) messages.push("Class level must be at least 1.");
+
+		const sc = resolveSubclassFromClass(cls, entry.subclassRef);
+		const plan = getClassSkillProficiencyPlan(cls, sc);
+		if (plan?.chooseCount > 0) {
+			const ext = new Set(this._getBackgroundGrantedSkillKeys());
+			const granted = new Set(plan.granted);
+			const pool = new Set(plan.pool);
+			const n = (entry.skillProficiencyChoices || []).filter(sk => pool.has(sk) && !ext.has(sk) && !granted.has(sk)).length;
+			if (n !== plan.chooseCount) {
+				messages.push(`Choose ${plan.chooseCount} skill proficiencies for your class.`);
+			}
+		}
 
 		return {isValid: !messages.length, messages};
 	}
