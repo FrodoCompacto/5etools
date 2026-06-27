@@ -29,3 +29,6 @@ sw-injector.js
 
 # Dev scripts
 dev-*.sh
+
+# NotebookLM export output (local only)
+tools/notebooklm-export/output/

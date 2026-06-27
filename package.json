@@ -38,6 +38,7 @@
 		"version": "node node/version-bump.js",
 		"serve:dev": "http-server -c-1 --cors --port 5050",
 		"serve:dev:tls": "http-server -c-1 --cors --port 5051 --tls --cert certs-dev-only/throwaway-cert.pem --key certs-dev-only/throwaway-key.pem",
+		"export:notebooklm": "node tools/notebooklm-export/export.js",
 		"spellcheck:check-data": "echo \"This can take a few minutes.\" && npx cspell --no-progress --show-context --show-suggestions \"data/**/*.json\"",
 		"spellcheck:check-data-quick": "git diff --name-only | grep -P \"^data/[^.]+.json\" | npx cspell --no-progress --show-context --show-suggestions --file-list stdin",
 		"spellcheck:trust-data": "echo \"This can take a few minutes.\" && echo \"# new words on $(date)\" >> spellcheck/dnd-words.txt && npx cspell --words-only --unique \"./data/**/*.json\" | sort --ignore-case >> spellcheck/dnd-words.txt",
