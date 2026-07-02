@@ -1136,7 +1136,7 @@ export class ConverterCreature extends ConverterBase {
 					cur,
 					ptrList,
 					isMultiple,
-					fnIsMatchCurEntry: cur => /\b(?:following( effects)?|their effects follow|subjected to the [^.!?]+ effect)[^.!?]*:/.test(cur.entries.last().trim()),
+					fnIsMatchCurEntry: cur => /\b(?:following( effects)?|their effects follow|subjected to the [^.!?]+ effect).*:/.test(cur.entries.last().trim()),
 					fnIsMatchNxtStr: ({entryNxt, entryNxtStr}) => {
 						if (/\b(?:the target|all targeted)\b/i.test(entryNxtStr) && !entryNxt.name?.includes("(")) return true;
 						if (entryNxt.name && / Only\)$/.test(entryNxt.name)) return true;
@@ -1664,6 +1664,8 @@ export class ConverterCreature extends ConverterBase {
 
 	// SHARED UTILITY FUNCTIONS ////////////////////////////////////////////////////////////////////////////////////////
 	static _doStatblockPostProcess (stats, isMarkdown, options) {
+		this._doPostProcess_removePage(stats, options);
+
 		Renderer.monster.CHILD_PROPS_EXTENDED
 			.filter(prop => stats[prop])
 			.forEach(prop => {
@@ -1715,7 +1717,7 @@ export class ConverterCreature extends ConverterBase {
 		TagImmResVulnConditional.tryRun(stats);
 		DragonAgeTag.tryRun(stats);
 		FamiliarTag.tryRun(stats, {styleHint: options.styleHint});
-		AttachedItemTag.tryRun(stats);
+		AttachedItemTag.tryRun(stats, {styleHint: options.styleHint});
 		this._doStatblockPostProcess_doCleanup(stats, options);
 		this._doStatblockPostProcess_doVerify(stats, options);
 	}

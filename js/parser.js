@@ -270,6 +270,10 @@ Parser.sizeAbvToFull = function (abv) {
 	return Parser._parse_aToB(Parser.SIZE_ABV_TO_FULL, abv);
 };
 
+Parser.sizeAbvToShort = function (abv) {
+	return Parser._parse_aToB(Parser.SIZE_ABV_TO_SHORT, abv);
+};
+
 Parser.getAbilityModNumber = function (abilityScore) {
 	return Math.floor((abilityScore - 10) / 2);
 };
@@ -653,14 +657,14 @@ Parser.sourceJsonToDate = function (source) {
 
 Parser.sourceJsonToSourceClassname = function (source, {sourceJson = null} = {}) {
 	sourceJson ||= Parser.sourceJsonToJson(source);
-	return `source__${sourceJson.replace(/[^A-Za-z0-9-_]/g, "_")}`;
+	return `ve-source__${sourceJson.replace(/[^A-Za-z0-9-_]/g, "_")}`;
 };
 
 Parser.sourceJsonToMarkerHtml = function (source, {isList = false, isStatsName = false, isAddBrackets = false, additionalStyles = ""} = {}) {
 	source = Parser._getSourceStringFromSource(source);
 	// TODO(Future) consider enabling this
-	// if (SourceUtil.isPartneredSourceWotc(source)) return `<span class="help-subtle ve-source-marker ${isList ? `ve-source-marker--list` : ""} ${isStatsName ? `ve-source-marker--stats-name` : ""} ve-source-marker--partnered ${additionalStyles}" title="D&amp;D Partnered Source">${isList ? "" : "["}✦${isList ? "" : "]"}</span>`;
-	if (SourceUtil.isLegacySourceWotc(source)) return `<span class="help-subtle ve-source-marker ${isList ? `ve-source-marker--list` : ""} ${isStatsName ? `ve-source-marker--stats-name` : ""} ve-source-marker--legacy ${additionalStyles}" title="Legacy Source">${isAddBrackets ? "[" : ""}ʟ${isAddBrackets ? "]" : ""}</span>`;
+	// if (SourceUtil.isPartneredSourceWotc(source)) return `<span class="ve-help-subtle ve-source-marker ${isList ? `ve-source-marker--list` : ""} ${isStatsName ? `ve-source-marker--stats-name` : ""} ve-source-marker--partnered ${additionalStyles}" title="D&amp;D Partnered Source">${isList ? "" : "["}✦${isList ? "" : "]"}</span>`;
+	if (SourceUtil.isLegacySourceWotc(source)) return `<span class="ve-help-subtle ve-source-marker ${isList ? `ve-source-marker--list` : ""} ${isStatsName ? `ve-source-marker--stats-name` : ""} ve-source-marker--legacy ${additionalStyles}" title="Legacy Source">${isAddBrackets ? "[" : ""}ʟ${isAddBrackets ? "]" : ""}</span>`;
 	return "";
 };
 
@@ -717,7 +721,7 @@ Parser._moneyToFull = function (it, prop, propMult, opts = {isShortForm: false, 
 	if (it[prop] == null && it[propMult] == null) return "";
 	if (it[prop] != null) {
 		const {coin, mult} = Parser.getCurrencyAndMultiplier(it[prop], it.currencyConversion);
-		return `${(it[prop] * mult).toLocaleStringVe()}${opts.isSmallUnits ? `<span class="small ml-1">${coin}</span>` : ` ${coin}`}`;
+		return `${(it[prop] * mult).toLocaleStringVe()}${opts.isSmallUnits ? `<span class="small ve-ml-1">${coin}</span>` : ` ${coin}`}`;
 	} else if (it[propMult] != null) return opts.isShortForm ? `×${it[propMult]}` : `base value ×${it[propMult]}`;
 	return "";
 };
@@ -1453,7 +1457,7 @@ Parser.spRangeTypeToIcon = function (range) {
 
 Parser.spRangeToShortHtml = function (range) {
 	switch (range.type) {
-		case Parser.RNG_SPECIAL: return `<span class="fas fa-fw ${Parser.spRangeTypeToIcon(range.type)} help-subtle" title="Special"></span>`;
+		case Parser.RNG_SPECIAL: return `<span class="fas fa-fw ${Parser.spRangeTypeToIcon(range.type)} ve-help-subtle" title="Special"></span>`;
 		case Parser.RNG_POINT: return Parser.spRangeToShortHtml._renderPoint(range);
 		case Parser.RNG_LINE:
 		case Parser.RNG_CUBE:
@@ -1474,7 +1478,7 @@ Parser.spRangeToShortHtml._renderPoint = function (range) {
 		case Parser.RNG_UNLIMITED:
 		case Parser.RNG_UNLIMITED_SAME_PLANE:
 		case Parser.RNG_SPECIAL:
-		case Parser.RNG_TOUCH: return `<span class="fas fa-fw ${Parser.spRangeTypeToIcon(dist.type)} help-subtle" title="${Parser.spRangeTypeToFull(dist.type)}"></span>`;
+		case Parser.RNG_TOUCH: return `<span class="fas fa-fw ${Parser.spRangeTypeToIcon(dist.type)} ve-help-subtle" title="${Parser.spRangeTypeToFull(dist.type)}"></span>`;
 		case Parser.UNT_INCHES:
 		case Parser.UNT_FEET:
 		case Parser.UNT_YARDS:
@@ -1485,10 +1489,10 @@ Parser.spRangeToShortHtml._renderPoint = function (range) {
 };
 Parser.spRangeToShortHtml._renderArea = function (range) {
 	const size = range.distance;
-	return `<span class="fas fa-fw ${Parser.spRangeTypeToIcon(Parser.RNG_SELF)} help-subtle" title="Self"></span> ${size.amount}<span class="ve-small">-${Parser.getSingletonUnit(size.type, true)}</span> ${Parser.spRangeToShortHtml._getAreaStyleString(range)}`;
+	return `<span class="fas fa-fw ${Parser.spRangeTypeToIcon(Parser.RNG_SELF)} ve-help-subtle" title="Self"></span> ${size.amount}<span class="ve-small">-${Parser.getSingletonUnit(size.type, true)}</span> ${Parser.spRangeToShortHtml._getAreaStyleString(range)}`;
 };
 Parser.spRangeToShortHtml._getAreaStyleString = function (range) {
-	return `<span class="fas fa-fw ${Parser.spRangeTypeToIcon(range.type)} help-subtle" title="${Parser.spRangeTypeToFull(range.type)}"></span>`;
+	return `<span class="fas fa-fw ${Parser.spRangeTypeToIcon(range.type)} ve-help-subtle" title="${Parser.spRangeTypeToFull(range.type)}"></span>`;
 };
 
 Parser.spRangeToFull = function (range, {styleHint, isDisplaySelfArea = false} = {}) {
@@ -1694,7 +1698,7 @@ Parser._spSubclassItem = function ({fromSubclass, isTextOnly = false, isIncludeS
 	const ptClass = `<span title="Source: ${Parser.sourceJsonToFull(c.source)}${c.definedInSource ? ` From a class spell list defined in: ${Parser.sourceJsonToFull(c.definedInSource)}` : ""}">${Renderer.get().render(`{@class ${c.name}|${c.source}}`)}</span>`;
 	const ptSource = isIncludeSource ? ` (${Parser.sourceJsonToAbv(sc.source)})` : "";
 
-	return `<span class="italic" title="Source: ${Parser.sourceJsonToFull(fromSubclass.subclass.source)}">${Renderer.get().render(`{@class ${c.name}|${c.source}|${text}|${sc.shortName}|${sc.source}}`)}</span>${isIncludeSource ? ptSource : ""} ${ptClass}`;
+	return `<span class="ve-italic" title="Source: ${Parser.sourceJsonToFull(fromSubclass.subclass.source)}">${Renderer.get().render(`{@class ${c.name}|${c.source}|${text}|${sc.shortName}|${sc.source}}`)}</span>${isIncludeSource ? ptSource : ""} ${ptClass}`;
 };
 
 Parser.SPELL_ATTACK_TYPE_TO_FULL = {};
@@ -2251,6 +2255,7 @@ Parser.prereqPatronToShort = function (patron) {
 
 Parser.FEAT_CATEGORY_TO_FULL = {
 	"D": "Dragonmark",
+	"DG": "Dark Gift",
 	"G": "General",
 	"O": "Origin",
 	"FS": "Fighting Style",
@@ -2308,6 +2313,7 @@ Parser.CHAR_OPTIONAL_FEATURE_TYPE_TO_FULL = {
 	"DG": "Dark Gift",
 	"RF:B": "Replacement Feature: Background",
 	"CS": "Character Secret", // Specific to IDRotF (rules on page 14)
+	"PTH": "Path",
 };
 
 Parser.charCreationOptionTypeToFull = function (type) {
@@ -2386,8 +2392,8 @@ Parser.weightToFull = function (lbs, isSmallUnit) {
 	const tons = Math.floor(lbs / 2000);
 	lbs = lbs - (2000 * tons);
 	return [
-		tons ? `${tons}${isSmallUnit ? `<span class="ve-small ml-1">` : " "}ton${tons === 1 ? "" : "s"}${isSmallUnit ? `</span>` : ""}` : null,
-		lbs ? `${lbs}${isSmallUnit ? `<span class="ve-small ml-1">` : " "}lb.${isSmallUnit ? `</span>` : ""}` : null,
+		tons ? `${tons}${isSmallUnit ? `<span class="ve-small ve-ml-1">` : " "}ton${tons === 1 ? "" : "s"}${isSmallUnit ? `</span>` : ""}` : null,
+		lbs ? `${lbs}${isSmallUnit ? `<span class="ve-small ve-ml-1">` : " "}lb.${isSmallUnit ? `</span>` : ""}` : null,
 	].filter(Boolean).join(", ");
 };
 
@@ -2428,8 +2434,8 @@ Parser.CAT_ID_VEHICLE = 31;
 Parser.CAT_ID_PACT_BOON = 32;
 Parser.CAT_ID_ELEMENTAL_DISCIPLINE = 33;
 Parser.CAT_ID_ARTIFICER_INFUSION = 34;
-Parser.CAT_ID_SHIP_UPGRADE = 35;
-Parser.CAT_ID_INFERNAL_WAR_MACHINE_UPGRADE = 36;
+Parser.CAT_ID_VEHICLE_UPGRADE_SHIP = 35;
+Parser.CAT_ID_VEHICLE_UPGRADE_INFERNAL_WAR_MACHINE = 36;
 Parser.CAT_ID_ONOMANCY_RESONANT = 37;
 Parser.CAT_ID_RUNE_KNIGHT_RUNE = 37;
 Parser.CAT_ID_ALCHEMICAL_FORMULA = 38;
@@ -2442,13 +2448,16 @@ Parser.CAT_ID_BOOK = 44;
 Parser.CAT_ID_PAGE = 45;
 Parser.CAT_ID_LEGENDARY_GROUP = 46;
 Parser.CAT_ID_CHAR_CREATION_OPTIONS = 47;
-Parser.CAT_ID_RECIPES = 48;
+Parser.CAT_ID_RECIPE = 48;
 Parser.CAT_ID_STATUS = 49;
 Parser.CAT_ID_SKILLS = 50;
 Parser.CAT_ID_SENSES = 51;
 Parser.CAT_ID_DECK = 52;
 Parser.CAT_ID_CARD = 53;
 Parser.CAT_ID_ITEM_MASTERY = 54;
+// Parser.CAT_ID_FACILITY = 55; // Unused in 2014
+Parser.CAT_ID_VEHICLE_UPGRADE_OTHER = 56;
+Parser.CAT_ID_CROCHET_PATTERN = 57;
 
 Parser.CAT_ID_GROUPS = {
 	"optionalfeature": [
@@ -2468,8 +2477,9 @@ Parser.CAT_ID_GROUPS = {
 		Parser.CAT_ID_MANEUVER,
 	],
 	"vehicleUpgrade": [
-		Parser.CAT_ID_SHIP_UPGRADE,
-		Parser.CAT_ID_INFERNAL_WAR_MACHINE_UPGRADE,
+		Parser.CAT_ID_VEHICLE_UPGRADE_SHIP,
+		Parser.CAT_ID_VEHICLE_UPGRADE_INFERNAL_WAR_MACHINE,
+		Parser.CAT_ID_VEHICLE_UPGRADE_OTHER,
 	],
 };
 
@@ -2508,8 +2518,9 @@ Parser.CAT_ID_TO_FULL[Parser.CAT_ID_VEHICLE] = "Vehicle";
 Parser.CAT_ID_TO_FULL[Parser.CAT_ID_PACT_BOON] = "Pact Boon";
 Parser.CAT_ID_TO_FULL[Parser.CAT_ID_ELEMENTAL_DISCIPLINE] = "Elemental Discipline";
 Parser.CAT_ID_TO_FULL[Parser.CAT_ID_ARTIFICER_INFUSION] = "Infusion";
-Parser.CAT_ID_TO_FULL[Parser.CAT_ID_SHIP_UPGRADE] = "Ship Upgrade";
-Parser.CAT_ID_TO_FULL[Parser.CAT_ID_INFERNAL_WAR_MACHINE_UPGRADE] = "Infernal War Machine Upgrade";
+Parser.CAT_ID_TO_FULL[Parser.CAT_ID_VEHICLE_UPGRADE_SHIP] = "Ship Upgrade";
+Parser.CAT_ID_TO_FULL[Parser.CAT_ID_VEHICLE_UPGRADE_INFERNAL_WAR_MACHINE] = "Infernal War Machine Upgrade";
+Parser.CAT_ID_TO_FULL[Parser.CAT_ID_VEHICLE_UPGRADE_OTHER] = "Vehicle Upgrade";
 Parser.CAT_ID_TO_FULL[Parser.CAT_ID_ONOMANCY_RESONANT] = "Onomancy Resonant";
 Parser.CAT_ID_TO_FULL[Parser.CAT_ID_RUNE_KNIGHT_RUNE] = "Rune Knight Rune";
 Parser.CAT_ID_TO_FULL[Parser.CAT_ID_ALCHEMICAL_FORMULA] = "Alchemical Formula";
@@ -2522,7 +2533,8 @@ Parser.CAT_ID_TO_FULL[Parser.CAT_ID_BOOK] = "Book";
 Parser.CAT_ID_TO_FULL[Parser.CAT_ID_PAGE] = "Page";
 Parser.CAT_ID_TO_FULL[Parser.CAT_ID_LEGENDARY_GROUP] = "Legendary Group";
 Parser.CAT_ID_TO_FULL[Parser.CAT_ID_CHAR_CREATION_OPTIONS] = "Character Creation Option";
-Parser.CAT_ID_TO_FULL[Parser.CAT_ID_RECIPES] = "Recipe";
+Parser.CAT_ID_TO_FULL[Parser.CAT_ID_RECIPE] = "Recipe";
+Parser.CAT_ID_TO_FULL[Parser.CAT_ID_CROCHET_PATTERN] = "Crochet Pattern";
 Parser.CAT_ID_TO_FULL[Parser.CAT_ID_STATUS] = "Status";
 Parser.CAT_ID_TO_FULL[Parser.CAT_ID_DECK] = "Deck";
 Parser.CAT_ID_TO_FULL[Parser.CAT_ID_CARD] = "Card";
@@ -2567,8 +2579,9 @@ Parser.CAT_ID_TO_PROP[Parser.CAT_ID_MANEUVER_BATTLE_MASTER] = "optionalfeature";
 Parser.CAT_ID_TO_PROP[Parser.CAT_ID_PACT_BOON] = "optionalfeature";
 Parser.CAT_ID_TO_PROP[Parser.CAT_ID_ELEMENTAL_DISCIPLINE] = "optionalfeature";
 Parser.CAT_ID_TO_PROP[Parser.CAT_ID_ARTIFICER_INFUSION] = "optionalfeature";
-Parser.CAT_ID_TO_PROP[Parser.CAT_ID_SHIP_UPGRADE] = "vehicleUpgrade";
-Parser.CAT_ID_TO_PROP[Parser.CAT_ID_INFERNAL_WAR_MACHINE_UPGRADE] = "vehicleUpgrade";
+Parser.CAT_ID_TO_PROP[Parser.CAT_ID_VEHICLE_UPGRADE_SHIP] = "vehicleUpgrade";
+Parser.CAT_ID_TO_PROP[Parser.CAT_ID_VEHICLE_UPGRADE_INFERNAL_WAR_MACHINE] = "vehicleUpgrade";
+Parser.CAT_ID_TO_PROP[Parser.CAT_ID_VEHICLE_UPGRADE_OTHER] = "vehicleUpgrade";
 Parser.CAT_ID_TO_PROP[Parser.CAT_ID_ONOMANCY_RESONANT] = "optionalfeature";
 Parser.CAT_ID_TO_PROP[Parser.CAT_ID_RUNE_KNIGHT_RUNE] = "optionalfeature";
 Parser.CAT_ID_TO_PROP[Parser.CAT_ID_ALCHEMICAL_FORMULA] = "optionalfeature";
@@ -2583,7 +2596,8 @@ Parser.CAT_ID_TO_PROP[Parser.CAT_ID_BOOK] = "book";
 Parser.CAT_ID_TO_PROP[Parser.CAT_ID_PAGE] = null;
 Parser.CAT_ID_TO_PROP[Parser.CAT_ID_LEGENDARY_GROUP] = "legendaryGroup";
 Parser.CAT_ID_TO_PROP[Parser.CAT_ID_CHAR_CREATION_OPTIONS] = "charoption";
-Parser.CAT_ID_TO_PROP[Parser.CAT_ID_RECIPES] = "recipe";
+Parser.CAT_ID_TO_PROP[Parser.CAT_ID_RECIPE] = "recipe";
+Parser.CAT_ID_TO_PROP[Parser.CAT_ID_CROCHET_PATTERN] = "crochetPattern";
 Parser.CAT_ID_TO_PROP[Parser.CAT_ID_STATUS] = "status";
 Parser.CAT_ID_TO_PROP[Parser.CAT_ID_DECK] = "deck";
 Parser.CAT_ID_TO_PROP[Parser.CAT_ID_CARD] = "card";
@@ -2874,6 +2888,29 @@ Parser.SP_SCHOOL_ABV_TO_SHORT[Parser.SKL_ABV_TRA] = "Trans.";
 Parser.SP_SCHOOL_ABV_TO_SHORT[Parser.SKL_ABV_CON] = "Conj.";
 Parser.SP_SCHOOL_ABV_TO_SHORT[Parser.SKL_ABV_PSI] = "Psi.";
 
+Parser.SP_SCHOOL_ABV_TO_CSS_CLASS = {};
+Parser.SP_SCHOOL_ABV_TO_CSS_CLASS[Parser.SKL_ABV_ABJ] = "ve-sp__school--a";
+Parser.SP_SCHOOL_ABV_TO_CSS_CLASS[Parser.SKL_ABV_CON] = "ve-sp__school--c";
+Parser.SP_SCHOOL_ABV_TO_CSS_CLASS[Parser.SKL_ABV_DIV] = "ve-sp__school--d";
+Parser.SP_SCHOOL_ABV_TO_CSS_CLASS[Parser.SKL_ABV_ENC] = "ve-sp__school--e";
+Parser.SP_SCHOOL_ABV_TO_CSS_CLASS[Parser.SKL_ABV_EVO] = "ve-sp__school--v";
+Parser.SP_SCHOOL_ABV_TO_CSS_CLASS[Parser.SKL_ABV_ILL] = "ve-sp__school--i";
+Parser.SP_SCHOOL_ABV_TO_CSS_CLASS[Parser.SKL_ABV_NEC] = "ve-sp__school--n";
+Parser.SP_SCHOOL_ABV_TO_CSS_CLASS[Parser.SKL_ABV_PSI] = "ve-sp__school--p";
+Parser.SP_SCHOOL_ABV_TO_CSS_CLASS[Parser.SKL_ABV_TRA] = "ve-sp__school--t";
+
+Parser.spSchoolAbvToStyleClass = function (school) {
+	return Parser.SP_SCHOOL_ABV_TO_CSS_CLASS[school] || "";
+};
+
+Parser.PSI_ABV_TYPE_TO_CSS_CLASS = {};
+Parser.PSI_ABV_TYPE_TO_CSS_CLASS[Parser.PSI_ABV_TYPE_TALENT] = "ve-psi__type--t";
+Parser.PSI_ABV_TYPE_TO_CSS_CLASS[Parser.PSI_ABV_TYPE_DISCIPLINE] = "ve-psi__type--d";
+
+Parser.psiTypeAbvToStyleClass = function (type) {
+	return Parser.PSI_ABV_TYPE_TO_CSS_CLASS[type] || "";
+};
+
 Parser.ATB_ABV_TO_FULL = {
 	"str": "Strength",
 	"dex": "Dexterity",
@@ -2924,18 +2961,34 @@ Parser.SZ_HUGE = "H";
 Parser.SZ_GARGANTUAN = "G";
 Parser.SZ_COLOSSAL = "C";
 Parser.SZ_VARIES = "V";
+
 Parser.SIZE_ABVS = [Parser.SZ_TINY, Parser.SZ_SMALL, Parser.SZ_MEDIUM, Parser.SZ_LARGE, Parser.SZ_HUGE, Parser.SZ_GARGANTUAN, Parser.SZ_VARIES];
-Parser.SIZE_ABV_TO_FULL = {};
-Parser.SIZE_ABV_TO_FULL[Parser.SZ_FINE] = "Fine";
-Parser.SIZE_ABV_TO_FULL[Parser.SZ_DIMINUTIVE] = "Diminutive";
-Parser.SIZE_ABV_TO_FULL[Parser.SZ_TINY] = "Tiny";
-Parser.SIZE_ABV_TO_FULL[Parser.SZ_SMALL] = "Small";
-Parser.SIZE_ABV_TO_FULL[Parser.SZ_MEDIUM] = "Medium";
-Parser.SIZE_ABV_TO_FULL[Parser.SZ_LARGE] = "Large";
-Parser.SIZE_ABV_TO_FULL[Parser.SZ_HUGE] = "Huge";
-Parser.SIZE_ABV_TO_FULL[Parser.SZ_GARGANTUAN] = "Gargantuan";
-Parser.SIZE_ABV_TO_FULL[Parser.SZ_COLOSSAL] = "Colossal";
-Parser.SIZE_ABV_TO_FULL[Parser.SZ_VARIES] = "Varies";
+
+Parser.SIZE_ABV_TO_FULL = {
+	[Parser.SZ_FINE]: "Fine",
+	[Parser.SZ_DIMINUTIVE]: "Diminutive",
+	[Parser.SZ_TINY]: "Tiny",
+	[Parser.SZ_SMALL]: "Small",
+	[Parser.SZ_MEDIUM]: "Medium",
+	[Parser.SZ_LARGE]: "Large",
+	[Parser.SZ_HUGE]: "Huge",
+	[Parser.SZ_GARGANTUAN]: "Gargantuan",
+	[Parser.SZ_COLOSSAL]: "Colossal",
+	[Parser.SZ_VARIES]: "Varies",
+};
+
+Parser.SIZE_ABV_TO_SHORT = {
+	[Parser.SZ_FINE]: "Fin.",
+	[Parser.SZ_DIMINUTIVE]: "Dmtv.",
+	[Parser.SZ_TINY]: "Tin.",
+	[Parser.SZ_SMALL]: "Sml.",
+	[Parser.SZ_MEDIUM]: "Med.",
+	[Parser.SZ_LARGE]: "Lrg.",
+	[Parser.SZ_HUGE]: "Hge.",
+	[Parser.SZ_GARGANTUAN]: "Grgn.",
+	[Parser.SZ_COLOSSAL]: "Clsl.",
+	[Parser.SZ_VARIES]: "Vars.",
+};
 
 Parser.XP_CHART_ALT = {
 	"0": 10,
@@ -3039,6 +3092,42 @@ Parser.VEHICLE_TYPE_TO_FULL = {
 
 Parser.vehicleTypeToFull = function (vehicleType) {
 	return Parser._parse_aToB(Parser.VEHICLE_TYPE_TO_FULL, vehicleType);
+};
+
+Parser.CROCHET_PATTERN_SKILL_LEVEL_TO_FULL = {
+	"B": "Beginner",
+	"I": "Intermediate",
+	"A": "Advanced",
+};
+
+Parser.crochetPatternSkilLevelToFull = function (lvl) {
+	return Parser._parse_aToB(Parser.CROCHET_PATTERN_SKILL_LEVEL_TO_FULL, lvl);
+};
+
+Parser.CROCHET_HOOK_MM_TO_US = {
+	"2.25": "B/1",
+	"2.75": "C",
+	"3.25": "D",
+	"3.50": "E/4",
+	"3.75": "F",
+	"4": "G/6",
+	"4.25": "G/6",
+	"4.50": "7",
+	"5": "H/8",
+	"5.25": "I",
+	"5.50": "I/9",
+	"6": "J/10",
+	"6.50": "K",
+	"9": "M/13",
+	"10": "N/15",
+	"12": "P/16",
+	"15": "Q",
+	"16": "Q",
+	"19": "S",
+};
+
+Parser.crochetHookMmToUs = function (sz) {
+	return Parser._parse_aToB(Parser.CROCHET_HOOK_MM_TO_US, sz);
 };
 
 // SOURCES =============================================================================================================
@@ -3157,6 +3246,8 @@ Parser.SRC_SCREEN_SPELLJAMMER = "ScreenSpelljammer";
 Parser.SRC_HF = "HF";
 Parser.SRC_HFFotM = "HFFotM";
 Parser.SRC_HFStCM = "HFStCM";
+Parser.SRC_PaF = "PaF";
+Parser.SRC_HFDoMM = "HFDoMM";
 Parser.SRC_CM = "CM";
 Parser.SRC_NRH = "NRH";
 Parser.SRC_NRH_TCMC = "NRH-TCMC";
@@ -3178,12 +3269,7 @@ Parser.SRC_PiP = "PiP";
 Parser.SRC_DitLCoT = "DitLCoT";
 Parser.SRC_VNotEE = "VNotEE";
 Parser.SRC_LRDT = "LRDT";
-
-Parser.SRC_AL_PREFIX = "AL";
-
-Parser.SRC_ALCoS = `${Parser.SRC_AL_PREFIX}CurseOfStrahd`;
-Parser.SRC_ALEE = `${Parser.SRC_AL_PREFIX}ElementalEvil`;
-Parser.SRC_ALRoD = `${Parser.SRC_AL_PREFIX}RageOfDemons`;
+Parser.SRC_CaBoMP = "CaBoMP";
 
 Parser.SRC_PS_PREFIX = "PS";
 
@@ -3222,15 +3308,15 @@ Parser.MisMVX_PREFIX = "Misplaced Monsters: Volume ";
 Parser.AA_PREFIX = "Adventure Atlas: ";
 
 Parser.SOURCE_JSON_TO_FULL = {};
+Parser.SOURCE_JSON_TO_FULL[Parser.SRC_PHB] = "Player's Handbook (2014)";
+Parser.SOURCE_JSON_TO_FULL[Parser.SRC_DMG] = "Dungeon Master's Guide (2014)";
+Parser.SOURCE_JSON_TO_FULL[Parser.SRC_MM] = "Monster Manual (2014)";
 Parser.SOURCE_JSON_TO_FULL[Parser.SRC_CoS] = "Curse of Strahd";
-Parser.SOURCE_JSON_TO_FULL[Parser.SRC_DMG] = "Dungeon Master's Guide";
 Parser.SOURCE_JSON_TO_FULL[Parser.SRC_EEPC] = "Elemental Evil Player's Companion";
 Parser.SOURCE_JSON_TO_FULL[Parser.SRC_EET] = "Elemental Evil: Trinkets";
 Parser.SOURCE_JSON_TO_FULL[Parser.SRC_HotDQ] = "Hoard of the Dragon Queen";
 Parser.SOURCE_JSON_TO_FULL[Parser.SRC_LMoP] = "Lost Mine of Phandelver";
-Parser.SOURCE_JSON_TO_FULL[Parser.SRC_MM] = "Monster Manual";
 Parser.SOURCE_JSON_TO_FULL[Parser.SRC_OotA] = "Out of the Abyss";
-Parser.SOURCE_JSON_TO_FULL[Parser.SRC_PHB] = "Player's Handbook";
 Parser.SOURCE_JSON_TO_FULL[Parser.SRC_PotA] = "Princes of the Apocalypse";
 Parser.SOURCE_JSON_TO_FULL[Parser.SRC_RoT] = "The Rise of Tiamat";
 Parser.SOURCE_JSON_TO_FULL[Parser.SRC_RoTOS] = "The Rise of Tiamat Online Supplement";
@@ -3333,6 +3419,8 @@ Parser.SOURCE_JSON_TO_FULL[Parser.SRC_SCREEN_SPELLJAMMER] = "Dungeon Master's Sc
 Parser.SOURCE_JSON_TO_FULL[Parser.SRC_HF] = "Heroes' Feast";
 Parser.SOURCE_JSON_TO_FULL[Parser.SRC_HFFotM] = "Heroes' Feast: Flavors of the Multiverse";
 Parser.SOURCE_JSON_TO_FULL[Parser.SRC_HFStCM] = "Heroes' Feast: Saving the Children's Menu";
+Parser.SOURCE_JSON_TO_FULL[Parser.SRC_PaF] = "Puncheons and Flagons";
+Parser.SOURCE_JSON_TO_FULL[Parser.SRC_HFDoMM] = "Heroes' Feast: The Deck of Many Morsels";
 Parser.SOURCE_JSON_TO_FULL[Parser.SRC_CM] = "Candlekeep Mysteries";
 Parser.SOURCE_JSON_TO_FULL[Parser.SRC_NRH] = Parser.NRH_NAME;
 Parser.SOURCE_JSON_TO_FULL[Parser.SRC_NRH_TCMC] = `${Parser.NRH_NAME}: The Candy Mountain Caper`;
@@ -3354,9 +3442,6 @@ Parser.SOURCE_JSON_TO_FULL[Parser.SRC_PiP] = "Peril in Pinebrook";
 Parser.SOURCE_JSON_TO_FULL[Parser.SRC_DitLCoT] = "Descent into the Lost Caverns of Tsojcanth";
 Parser.SOURCE_JSON_TO_FULL[Parser.SRC_VNotEE] = "Vecna: Nest of the Eldritch Eye";
 Parser.SOURCE_JSON_TO_FULL[Parser.SRC_LRDT] = "Red Dragon's Tale: A LEGO Adventure";
-Parser.SOURCE_JSON_TO_FULL[Parser.SRC_ALCoS] = `${Parser.AL_PREFIX}Curse of Strahd`;
-Parser.SOURCE_JSON_TO_FULL[Parser.SRC_ALEE] = `${Parser.AL_PREFIX}Elemental Evil`;
-Parser.SOURCE_JSON_TO_FULL[Parser.SRC_ALRoD] = `${Parser.AL_PREFIX}Rage of Demons`;
 Parser.SOURCE_JSON_TO_FULL[Parser.SRC_PSA] = `${Parser.PS_PREFIX}Amonkhet`;
 Parser.SOURCE_JSON_TO_FULL[Parser.SRC_PSI] = `${Parser.PS_PREFIX}Innistrad`;
 Parser.SOURCE_JSON_TO_FULL[Parser.SRC_PSK] = `${Parser.PS_PREFIX}Kaladesh`;
@@ -3371,17 +3456,18 @@ Parser.SOURCE_JSON_TO_FULL[Parser.SRC_MCV3MC] = `${Parser.MCVX_PREFIX}3: Minecra
 Parser.SOURCE_JSON_TO_FULL[Parser.SRC_MCV4EC] = `${Parser.MCVX_PREFIX}4: Eldraine Creatures`;
 Parser.SOURCE_JSON_TO_FULL[Parser.SRC_MisMV1] = `${Parser.MisMVX_PREFIX}1`;
 Parser.SOURCE_JSON_TO_FULL[Parser.SRC_AATM] = `${Parser.AA_PREFIX}The Mortuary`;
+Parser.SOURCE_JSON_TO_FULL[Parser.SRC_CaBoMP] = "Crochet: A Book of Many Patterns";
 
 Parser.SOURCE_JSON_TO_ABV = {};
+Parser.SOURCE_JSON_TO_ABV[Parser.SRC_PHB] = "PHB'14";
+Parser.SOURCE_JSON_TO_ABV[Parser.SRC_DMG] = "DMG'14";
+Parser.SOURCE_JSON_TO_ABV[Parser.SRC_MM] = "MM'14";
 Parser.SOURCE_JSON_TO_ABV[Parser.SRC_CoS] = "CoS";
-Parser.SOURCE_JSON_TO_ABV[Parser.SRC_DMG] = "DMG";
 Parser.SOURCE_JSON_TO_ABV[Parser.SRC_EEPC] = "EEPC";
 Parser.SOURCE_JSON_TO_ABV[Parser.SRC_EET] = "EET";
 Parser.SOURCE_JSON_TO_ABV[Parser.SRC_HotDQ] = "HotDQ";
 Parser.SOURCE_JSON_TO_ABV[Parser.SRC_LMoP] = "LMoP";
-Parser.SOURCE_JSON_TO_ABV[Parser.SRC_MM] = "MM";
 Parser.SOURCE_JSON_TO_ABV[Parser.SRC_OotA] = "OotA";
-Parser.SOURCE_JSON_TO_ABV[Parser.SRC_PHB] = "PHB";
 Parser.SOURCE_JSON_TO_ABV[Parser.SRC_PotA] = "PotA";
 Parser.SOURCE_JSON_TO_ABV[Parser.SRC_RoT] = "RoT";
 Parser.SOURCE_JSON_TO_ABV[Parser.SRC_RoTOS] = "RoTOS";
@@ -3484,6 +3570,8 @@ Parser.SOURCE_JSON_TO_ABV[Parser.SRC_SCREEN_SPELLJAMMER] = "ScSJ";
 Parser.SOURCE_JSON_TO_ABV[Parser.SRC_HF] = "HF";
 Parser.SOURCE_JSON_TO_ABV[Parser.SRC_HFFotM] = "HFFotM";
 Parser.SOURCE_JSON_TO_ABV[Parser.SRC_HFStCM] = "HFStCM";
+Parser.SOURCE_JSON_TO_ABV[Parser.SRC_PaF] = "PaF";
+Parser.SOURCE_JSON_TO_ABV[Parser.SRC_HFDoMM] = "HFDoMM";
 Parser.SOURCE_JSON_TO_ABV[Parser.SRC_CM] = "CM";
 Parser.SOURCE_JSON_TO_ABV[Parser.SRC_NRH] = "NRH";
 Parser.SOURCE_JSON_TO_ABV[Parser.SRC_NRH_TCMC] = "NRH-TCMC";
@@ -3505,9 +3593,6 @@ Parser.SOURCE_JSON_TO_ABV[Parser.SRC_PiP] = "PiP";
 Parser.SOURCE_JSON_TO_ABV[Parser.SRC_DitLCoT] = "DitLCoT";
 Parser.SOURCE_JSON_TO_ABV[Parser.SRC_VNotEE] = "VNotEE";
 Parser.SOURCE_JSON_TO_ABV[Parser.SRC_LRDT] = "LRDT";
-Parser.SOURCE_JSON_TO_ABV[Parser.SRC_ALCoS] = "ALCoS";
-Parser.SOURCE_JSON_TO_ABV[Parser.SRC_ALEE] = "ALEE";
-Parser.SOURCE_JSON_TO_ABV[Parser.SRC_ALRoD] = "ALRoD";
 Parser.SOURCE_JSON_TO_ABV[Parser.SRC_PSA] = "PSA";
 Parser.SOURCE_JSON_TO_ABV[Parser.SRC_PSI] = "PSI";
 Parser.SOURCE_JSON_TO_ABV[Parser.SRC_PSK] = "PSK";
@@ -3522,17 +3607,18 @@ Parser.SOURCE_JSON_TO_ABV[Parser.SRC_MCV3MC] = "MCV3MC";
 Parser.SOURCE_JSON_TO_ABV[Parser.SRC_MCV4EC] = "MCV4EC";
 Parser.SOURCE_JSON_TO_ABV[Parser.SRC_MisMV1] = "MisMV1";
 Parser.SOURCE_JSON_TO_ABV[Parser.SRC_AATM] = "AATM";
+Parser.SOURCE_JSON_TO_ABV[Parser.SRC_CaBoMP] = "CaBoMP";
 
 Parser.SOURCE_JSON_TO_DATE = {};
-Parser.SOURCE_JSON_TO_DATE[Parser.SRC_CoS] = "2016-03-15";
+Parser.SOURCE_JSON_TO_DATE[Parser.SRC_PHB] = "2014-08-19";
 Parser.SOURCE_JSON_TO_DATE[Parser.SRC_DMG] = "2014-12-09";
+Parser.SOURCE_JSON_TO_DATE[Parser.SRC_MM] = "2014-09-30";
+Parser.SOURCE_JSON_TO_DATE[Parser.SRC_CoS] = "2016-03-15";
 Parser.SOURCE_JSON_TO_DATE[Parser.SRC_EEPC] = "2015-03-10";
 Parser.SOURCE_JSON_TO_DATE[Parser.SRC_EET] = "2015-03-10";
 Parser.SOURCE_JSON_TO_DATE[Parser.SRC_HotDQ] = "2014-08-19";
 Parser.SOURCE_JSON_TO_DATE[Parser.SRC_LMoP] = "2014-07-15";
-Parser.SOURCE_JSON_TO_DATE[Parser.SRC_MM] = "2014-09-30";
 Parser.SOURCE_JSON_TO_DATE[Parser.SRC_OotA] = "2015-09-15";
-Parser.SOURCE_JSON_TO_DATE[Parser.SRC_PHB] = "2014-08-19";
 Parser.SOURCE_JSON_TO_DATE[Parser.SRC_PotA] = "2015-04-07";
 Parser.SOURCE_JSON_TO_DATE[Parser.SRC_RoT] = "2014-11-04";
 Parser.SOURCE_JSON_TO_DATE[Parser.SRC_RoTOS] = "2014-11-04";
@@ -3634,6 +3720,8 @@ Parser.SOURCE_JSON_TO_DATE[Parser.SRC_SCREEN_SPELLJAMMER] = "2022-08-16";
 Parser.SOURCE_JSON_TO_DATE[Parser.SRC_HF] = "2020-10-27";
 Parser.SOURCE_JSON_TO_DATE[Parser.SRC_HFFotM] = "2023-11-07";
 Parser.SOURCE_JSON_TO_DATE[Parser.SRC_HFStCM] = "2023-11-21";
+Parser.SOURCE_JSON_TO_DATE[Parser.SRC_PaF] = "2024-08-27";
+Parser.SOURCE_JSON_TO_DATE[Parser.SRC_HFDoMM] = "2024-10-01";
 Parser.SOURCE_JSON_TO_DATE[Parser.SRC_CM] = "2021-03-16";
 Parser.SOURCE_JSON_TO_DATE[Parser.SRC_NRH] = "2021-09-01";
 Parser.SOURCE_JSON_TO_DATE[Parser.SRC_NRH_TCMC] = "2021-09-01";
@@ -3655,9 +3743,6 @@ Parser.SOURCE_JSON_TO_DATE[Parser.SRC_PiP] = "2023-11-20";
 Parser.SOURCE_JSON_TO_DATE[Parser.SRC_DitLCoT] = "2024-03-26";
 Parser.SOURCE_JSON_TO_DATE[Parser.SRC_VNotEE] = "2024-04-16";
 Parser.SOURCE_JSON_TO_DATE[Parser.SRC_LRDT] = "2024-04-01";
-Parser.SOURCE_JSON_TO_DATE[Parser.SRC_ALCoS] = "2016-03-15";
-Parser.SOURCE_JSON_TO_DATE[Parser.SRC_ALEE] = "2015-04-07";
-Parser.SOURCE_JSON_TO_DATE[Parser.SRC_ALRoD] = "2015-09-15";
 Parser.SOURCE_JSON_TO_DATE[Parser.SRC_PSA] = "2017-07-06";
 Parser.SOURCE_JSON_TO_DATE[Parser.SRC_PSI] = "2016-07-12";
 Parser.SOURCE_JSON_TO_DATE[Parser.SRC_PSK] = "2017-02-16";
@@ -3672,6 +3757,7 @@ Parser.SOURCE_JSON_TO_DATE[Parser.SRC_MCV3MC] = "2023-03-28";
 Parser.SOURCE_JSON_TO_DATE[Parser.SRC_MCV4EC] = "2023-09-21";
 Parser.SOURCE_JSON_TO_DATE[Parser.SRC_MisMV1] = "2023-05-03";
 Parser.SOURCE_JSON_TO_DATE[Parser.SRC_AATM] = "2023-10-17";
+Parser.SOURCE_JSON_TO_DATE[Parser.SRC_CaBoMP] = "2026-03-31";
 
 // region Source categories
 Parser.SOURCES_ADVENTURES = new Set([
@@ -3956,9 +4042,11 @@ Parser.SOURCES_AVAILABLE_DOCS_BOOK = {};
 	Parser.SRC_MPP,
 	Parser.SRC_HF,
 	Parser.SRC_HFFotM,
+	Parser.SRC_PaF,
 	Parser.SRC_BMT,
 	Parser.SRC_DMTCRG,
 	Parser.SRC_TD,
+	Parser.SRC_CaBoMP,
 ].forEach(src => {
 	Parser.SOURCES_AVAILABLE_DOCS_BOOK[src] = src;
 	Parser.SOURCES_AVAILABLE_DOCS_BOOK[src.toLowerCase()] = src;
@@ -4065,10 +4153,7 @@ Parser.getTagSource = function (tag, source) {
 
 	tag = tag.trim();
 
-	const tagMeta = Renderer.tag.TAG_LOOKUP[tag];
-
-	if (!tagMeta) throw new Error(`Unhandled tag "${tag}"`);
-	return tagMeta.defaultSource;
+	return Renderer.tag.getTagInfo(tag, {isRequired: true}).defaultSource;
 };
 
 Parser.PROP_TO_TAG = {
@@ -4079,6 +4164,7 @@ Parser.PROP_TO_TAG = {
 	"baseitem": "item",
 	"itemGroup": "item",
 	"magicvariant": "item",
+	"crochetPattern": "crochet",
 };
 Parser._RE_PROP_RAW_PREFIX = /^raw_/;
 Parser.getPropTag = function (prop) {
@@ -4113,6 +4199,8 @@ Parser.PROP_TO_DISPLAY_NAME = {
 	"bookData": "Book Text",
 	"makebrewCreatureTrait": "Homebrew Builder Creature Trait",
 	"charoption": "Other Character Creation Option",
+	"encounterShape": "Encounter Shape",
+	"crochetPattern": "Crochet Pattern",
 
 	"bonus": "Bonus Action",
 	"legendary": "Legendary Action",
@@ -4166,22 +4254,22 @@ Parser.NUMBERS_TENS = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "s
 Parser.NUMBERS_TEENS = ["ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
 
 // region Metric conversion
-Parser.metric = {
+Parser.metric = class {
 	// See MPMB's breakdown: https://old.reddit.com/r/dndnext/comments/6gkuec
-	MILES_TO_KILOMETRES: 1.6,
-	FEET_TO_METRES: 0.3, // 5 ft = 1.5 m
-	YARDS_TO_METRES: 0.9, // (as above)
-	POUNDS_TO_KILOGRAMS: 0.5, // 2 lb = 1 kg
+	static MILES_TO_KILOMETRES = 1.6;
+	static FEET_TO_METRES = 0.3; // 5 ft = 1.5 m
+	static YARDS_TO_METRES = 0.9; // (as above)
+	static POUNDS_TO_KILOGRAMS = 0.5; // 2 lb = 1 kg
 	// Other additions
-	INCHES_TO_CENTIMETERS: 2.5, // 1 in = 2.5 cm
-	CUBIC_FEET_TO_LIBRES: 28, // 1 ft³ = 28 L
+	static INCHES_TO_CENTIMETERS = 2.5; // 1 in = 2.5 cm
+	static CUBIC_FEET_TO_LITRES = 28; // 1 ft³ = 28 L
 
 	/**
 	 * @param {number} originalValue
 	 * @param {string} originalUnit
 	 * @param {?boolean} toFixed
 	 */
-	getMetricNumber ({originalValue, originalUnit, toFixed = null}) {
+	static getMetricNumber ({originalValue, originalUnit, toFixed = null}) {
 		if (originalValue == null || isNaN(originalValue)) return originalValue;
 
 		originalValue = Number(originalValue);
@@ -4194,19 +4282,19 @@ Parser.metric = {
 			case Parser.UNT_YARDS: out = originalValue * Parser.metric.YARDS_TO_METRES; break;
 			case Parser.UNT_MILES: out = originalValue * Parser.metric.MILES_TO_KILOMETRES; break;
 			case Parser.UNT_LBS: out = originalValue * Parser.metric.POUNDS_TO_KILOGRAMS; break;
-			case Parser.UNT_CUBIC_FEET: out = originalValue * Parser.metric.CUBIC_FEET_TO_LIBRES; break;
+			case Parser.UNT_CUBIC_FEET: out = originalValue * Parser.metric.CUBIC_FEET_TO_LITRES; break;
 			default: return originalValue;
 		}
 		if (toFixed != null) return NumberUtil.toFixedNumber(out, toFixed);
 		return out;
-	},
+	}
 
 	/**
 	 * @param {number} originalValue
 	 * @param {boolean} isShortForm
 	 * @param {isPlural} isShortForm
 	 */
-	getMetricUnit ({originalUnit, isShortForm = false, isPlural = true}) {
+	static getMetricUnit ({originalUnit, isShortForm = false, isPlural = true}) {
 		switch (Parser.getNormalizedUnit(originalUnit)) {
 			case Parser.UNT_INCHES: return isShortForm ? "cm" : `centimeter`[isPlural ? "toPlural" : "toString"]();
 			case Parser.UNT_FEET: return isShortForm ? "m" : `meter`[isPlural ? "toPlural" : "toString"]();
@@ -4216,7 +4304,14 @@ Parser.metric = {
 			case Parser.UNT_CUBIC_FEET: return isShortForm ? "L" : `liter`[isPlural ? "toPlural" : "toString"]();
 			default: return originalUnit;
 		}
-	},
+	}
+
+	static _MM_PER_INCHES = 25.4;
+
+	// Display to the nearest 0.5 in.
+	static getApproxDisplayInches (distMm) {
+		return Math.round((distMm / this._MM_PER_INCHES) * 2) / 2;
+	}
 };
 // endregion
 // region Map grids

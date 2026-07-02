@@ -2,7 +2,7 @@
 	"data": [
 		{
 			"type": "section",
-			"name": "Sage Advice Compendium",
+			"name": "Sage Advice Compendium (2014)",
 			"page": 1,
 			"id": "000",
 			"entries": [
@@ -17,12 +17,12 @@
 						{
 							"type": "list",
 							"items": [
-								"{@book Player's Handbook|PHB} (abbreviated PHB)",
-								"{@book Monster Manual|MM} (abbreviated MM)",
-								"{@book Dungeon Master's Guide|DMG} (abbreviated DMG)"
+								"{@book Player's Handbook (2014)|PHB} (abbreviated PHB)",
+								"{@book Monster Manual (2014)|MM} (abbreviated MM)",
+								"{@book Dungeon Master's Guide (2014)|DMG} (abbreviated DMG)"
 							]
 						},
-						"The free {@link Basic Rules|https://www.dndbeyond.com/sources/dnd/basic-rules-2014} contains portions of those three books.",
+						"The free {@link Basic Rules (2014)|https://www.dndbeyond.com/sources/dnd/basic-rules-2014} contains portions of those three books.",
 						{
 							"type": "entries",
 							"name": "Official Rulings",
@@ -171,7 +171,7 @@
 														"10 + your Dexterity modifier + your natural armor bonus. This is a calculation method typically used only by monsters and NPCs, although it is also relevant to a druid or another character who assumes a form that has natural armor.",
 														"These methods\u2014along with any others that give you a formula for calculating your AC\u2014are mutually exclusive; you can benefit from only one at a time. If you have access to more than one, you pick which one to use. For example, if you're a sorcerer/monk, you can use either Unarmored Defense or Draconic Resilience, not both. Similarly, a druid/ barbarian who transforms into a beast form that has natural armor can use either the beast's natural armor or Unarmored Defense (you aren't considered to be wearing armor when you use natural armor).",
 														"What about a shield? A shield increases your AC by 2 while you use it. For example, if you're unarmored and use a shield, your AC is 12 + your Dexterity modifier. Keep in mind that some AC calculations, such as a monk's Unarmored Defense, prohibit the use of a shield.",
-														"Once you have your base AC, it can be temporarily modified by situational bonuses and penalties. For instance, having half cover gives you a +2 bonus to your AC, and three-quarters cover gives a +5 bonus. Spells sometimes modify AC as well. {@spell Shield of faith}, for example, grants a target a +2 bonus to AC until the spell ends.",
+														"Once you have your base AC, it can be temporarily modified by situational bonuses and penalties. For instance, having {@quickref Cover||3||half cover} gives you a +2 bonus to your AC, and {@quickref Cover||3||three-quarters cover} gives a +5 bonus. Spells sometimes modify AC as well. {@spell Shield of faith}, for example, grants a target a +2 bonus to AC until the spell ends.",
 														"Magic items can also enhance your AC. Here are a few examples: {@item +1 chain mail} gives you an AC of 17, a {@item ring of protection} gives you a +1 bonus to AC no matter what you're wearing, and {@item bracers of defense} grant you a +2 bonus to AC if you're not wearing armor or using a shield."
 													]
 												}
@@ -3379,7 +3379,7 @@
 											"type": "entries",
 											"name": "Recent books include monster stat blocks\u2014like the dragon blessed in Fizban's Treasury of Dragons and the Silverquill apprentice in Strixhaven: A Curriculum of Chaos\u2014that contain actions designated as spell attacks, rather than weapon attacks. What was the motivation for adding this type of action to the game?",
 											"entries": [
-												"This type of action isn't new. Monsters have had spell attacks since the {@book Monster Manual|MM}. See the {@creature lich|MM|lich's} Paralyzing Touch action and the {@creature cambion|MM|cambion's} Fire Ray action for other examples of actions that are spell attacks. As discussed in the {@book introduction|MM|0|Melee and Ranged Attacks} of the {@book Monster Manual|MM}, a monster's attack action is designated as either a weapon attack or a spell attack."
+												"This type of action isn't new. Monsters have had spell attacks since the {@book Monster Manual|MM} (2014). See the {@creature lich|MM|lich's} Paralyzing Touch action and the {@creature cambion|MM|cambion's} Fire Ray action for other examples of actions that are spell attacks. As discussed in the {@book introduction|MM|0|Melee and Ranged Attacks} of the {@book Monster Manual|MM}, a monster's attack action is designated as either a weapon attack or a spell attack."
 											],
 											"id": "16b"
 										},

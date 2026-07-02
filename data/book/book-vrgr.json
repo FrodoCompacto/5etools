@@ -4580,11 +4580,11 @@
 									"items": [
 										"A creature that starts its turn in the Mists must succeed on a {@dc 20} Constitution saving throw or gain 1 level of {@condition exhaustion}. This {@condition exhaustion} can't be removed while the creature is in the Mists.",
 										"No matter how far a creature travels in the Mists, or which direction it goes, it gets turned around so that it eventually ends up back in the domain it left.",
-										"The area within the Mists is heavily obscured (see the {@book Player's Handbook|PHB} for details)."
+										"The area within the Mists is {@quickref Vision and Light||2||heavily obscured} (see the {@book Player's Handbook|PHB} for details)."
 									]
 								},
 								"Most Darklords can keep their domains' borders closed indefinitely and can reopen them at will. For some Darklords, slightly varied effects manifest when they close their domains. Others are limited in their ability to affect their borders. For each domain, specifics appear in the \"Closing the Borders\" portion of the section on that domain's Darklord.",
-								"If a domain's borders are open, the domain is still not easy to escape from. The area within the Mists remains heavily obscured, but the Mists don't cause creatures to gain levels of {@condition exhaustion}. Characters intent on passing through the Mists travel for {@dice 1d6} hours, then roll on the Wandering the Mists table to determine what happens.",
+								"If a domain's borders are open, the domain is still not easy to escape from. The area within the Mists remains {@quickref Vision and Light||2||heavily obscured}, but the Mists don't cause creatures to gain levels of {@condition exhaustion}. Characters intent on passing through the Mists travel for {@dice 1d6} hours, then roll on the Wandering the Mists table to determine what happens.",
 								{
 									"type": "table",
 									"caption": "Wandering the Mists",
@@ -4892,7 +4892,7 @@
 							"page": 65,
 							"id": "113",
 							"entries": [
-								"This chapter includes sidebars designed to help create player characters who hail from particular Domains of Dread. These sidebars describe the people of a particular domain, the horrors they routinely face, and their naming conventions. Share these sidebars freely with your players if they create characters from these domains. The naming conventions they reference note the names of peoples featured in the \"{@book Character Names|XGE|12}\" section of {@book Xanathar's Guide to Everything|XGE}, they do not describe a domain's broader culture. Use the questions included in each sidebar to inspire players with ideas for their characters. Players don't need to answer every question or concern themselves with accurately representing a domain. Rather, it's more important they create details that forge a strong sense of connection with their homeland."
+								"This chapter includes sidebars designed to help create player characters who hail from particular Domains of Dread. These sidebars describe the people of a particular domain, the horrors they routinely face, and their naming conventions. Share these sidebars freely with your players if they create characters from these domains. The naming conventions they reference note the names of peoples featured in the \"{@book Character Names|XGE|5}\" section of {@book Xanathar's Guide to Everything|XGE}, they do not describe a domain's broader culture. Use the questions included in each sidebar to inspire players with ideas for their characters. Players don't need to answer every question or concern themselves with accurately representing a domain. Rather, it's more important they create details that forge a strong sense of connection with their homeland."
 							]
 						}
 					]
@@ -8703,7 +8703,7 @@
 										],
 										[
 											"2",
-											"In Morfenzi, Vjorn Horstman envisions an army of bestial super soldiers. He works to perfect what he calls his \"primal serum,\" an elixir that inflicts those injected with a random form of lycanthropy. He seeks to use the characters as test subjects."
+											"In Morfenzi, Vjorn Horstman envisions an army of bestial super soldiers. He works to perfect what he calls his \"primal serum,\" an elixir that inflicts those injected with a random form of {@variantrule Player Characters as Lycanthropes|MM|lycanthropy}. He seeks to use the characters as test subjects."
 										],
 										[
 											"3",
@@ -12270,7 +12270,7 @@
 													"page": 142,
 													"id": "2f9",
 													"entries": [
-														"The Unbreakable Heart is a nonmagical scientific wonder that replaces a creature's heart. The device installs itself, connecting to a creature's anatomy and stitching itself into place if positioned in a cavity where the creature's heart used to be. A creature with the device inside them is immune to disease, ceases to age, and does not die of old age, though they can still die in other ways. The glowing device sheds light in a 10-foot radius and dim light for an additional 10 feet. While inside a creature, the device causes the creature to shed dim light in a 10-foot radius.",
+														"The Unbreakable Heart is a nonmagical scientific wonder that replaces a creature's heart. The device installs itself, connecting to a creature's anatomy and stitching itself into place if positioned in a cavity where the creature's heart used to be. A creature with the device inside them is immune to disease, ceases to age, and does not die of old age, though they can still die in other ways. The glowing device sheds light in a 10-foot radius and {@quickref Vision and Light||2||dim light} for an additional 10 feet. While inside a creature, the device causes the creature to shed {@quickref Vision and Light||2||dim light} in a 10-foot radius.",
 														{
 															"type": "image",
 															"href": {
@@ -12613,7 +12613,7 @@
 													"page": 147,
 													"id": "314",
 													"entries": [
-														"When Godefroy wishes to close his domain, fog rolls in off the sea and blankets the land. Everything in the domain that's outdoors is heavily obscured by the fog (see the {@book Player's Handbook|PHB}). Characters who reach the domain's borders through this fog are affected as detailed in \"{@book The Mists|VRGR|3|The Mists}\" at the start of this chapter."
+														"When Godefroy wishes to close his domain, fog rolls in off the sea and blankets the land. Everything in the domain that's outdoors is {@quickref Vision and Light||2||heavily obscured} by the fog (see the {@book Player's Handbook|PHB}). Characters who reach the domain's borders through this fog are affected as detailed in \"{@book The Mists|VRGR|3|The Mists}\" at the start of this chapter."
 													]
 												}
 											]
@@ -16327,7 +16327,7 @@
 									"page": 182,
 									"id": "420",
 									"entries": [
-										"Captain Larissa Snowmane pilots the paddleboat {@i River Dancer} along the rivers and coasts of Ravenloft's domains, righting wrongs and ferrying those in need to new homes. Larissa is a legend, known for her icy-white hair, dancing skill, and mezzo-soprano signing voice. As she approaches her seventieth year, she remains one of the domains' most widely traveled explorers. When danger threatens her vessel and crew, Captain Snowmane reluctantly uses a magical performance known as the Dance of the Dead, a forbidden song and dance that keeps Undead creatures at bay but slays living beings who witness it, then reanimates them as zombies. Larissa avoids rival riverboat captain Nathan Timothy and his ship, {@i Virago}, as well as the swampy domain of Souragne, where she learned her deadly magic from grim forces that consider her debt unpaid.",
+										"Captain Larissa Snowmane pilots the paddle boat {@i River Dancer} along the rivers and coasts of Ravenloft's domains, righting wrongs and ferrying those in need to new homes. Larissa is a legend, known for her icy-white hair, dancing skill, and mezzo-soprano signing voice. As she approaches her seventieth year, she remains one of the domains' most widely traveled explorers. When danger threatens her vessel and crew, Captain Snowmane reluctantly uses a magical performance known as the Dance of the Dead, a forbidden song and dance that keeps Undead creatures at bay but slays living beings who witness it, then reanimates them as zombies. Larissa avoids rival riverboat captain Nathan Timothy and his ship, {@i Virago}, as well as the swampy domain of Souragne, where she learned her deadly magic from grim forces that consider her debt unpaid.",
 										{
 											"type": "entries",
 											"name": "Larissa Snowmane's Traits",
@@ -16363,7 +16363,7 @@
 											"page": 182,
 											"id": "422",
 											"entries": [
-												"Larissa Snowmane is a human {@creature druid} with exceptional insight into navigating the waterways of the Mists. Her handsome, multilevel paddleboat {@i River Dancer} provides an exciting base of operations for wayfaring adventurers. Consider the following plots when featuring Larissa Snowmane in an adventure:",
+												"Larissa Snowmane is a human {@creature druid} with exceptional insight into navigating the waterways of the Mists. Her handsome, multilevel paddle boat {@i River Dancer} provides an exciting base of operations for wayfaring adventurers. Consider the following plots when featuring Larissa Snowmane in an adventure:",
 												{
 													"type": "list",
 													"items": [

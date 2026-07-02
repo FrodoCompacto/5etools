@@ -60,6 +60,7 @@ Behm
 Belisle
 Belledin
 Berggren
+Bergting
 Bernadini
 Bernardini
 Berube
@@ -159,6 +160,7 @@ Eidenschink
 Ejiwa
 Ejsing
 Ekaterina
+Elderbrain_com
 EldritchBlep
 elisaserioart
 ellinainthesky
@@ -397,6 +399,7 @@ Mikandii
 Minard
 Minguez
 Minttu
+Mithy
 Miyara
 MOAI
 Mocanu
@@ -541,6 +544,7 @@ Tedrick
 Tenery
 Terese
 Thabiso
+Thack
 Thacker
 Tinnel
 tinyraptors
@@ -576,6 +580,7 @@ Vehige
 Velinov
 Veltkamp
 Vetrova
+Viatoris
 Viko
 Villasenor
 Vinod
@@ -602,6 +607,7 @@ Yannlian
 Yaroslavova
 Yeong-Hao
 Yigit
+Yinfanowei
 Yongjae
 Yuhong
 Yuliya
@@ -612,6 +618,7 @@ Zanchetin
 Zezhou
 Zielińska
 Zirngibl
+Zoey
 Zolotukhina
 Zrom
 Zuzanna
