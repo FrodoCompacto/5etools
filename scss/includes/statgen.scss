@@ -2,7 +2,7 @@
 
 @layer vetools {
 	// (Class namespace to enable selectors in FVTT)
-	.statgen .statgen {
+	.ve-statgen .ve-statgen {
 		&-shared__ {
 			&btn-reset {
 				right: -3px;
@@ -117,7 +117,7 @@
 		}
 
 		// Ticker buttons always visible in statgen (compact cells)
-		.statgen-shared__ipt + .ui-ideco__wrp .ui-ideco__btn-ticker,
+		.ve-statgen-shared__ipt + .ui-ideco__wrp .ui-ideco__btn-ticker,
 		.ui-ideco__wrp .ui-ideco__btn-ticker {
 			opacity: 1;
 		}

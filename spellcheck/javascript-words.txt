@@ -35,6 +35,7 @@ blocklisting
 bookid
 bookref
 bookview
+BQDD
 BQGT
 brdr
 brewbuilder
@@ -77,6 +78,7 @@ Conv
 converterutils
 crcalc
 crcalculator
+crochetpatterns
 croutput
 csegp
 ctrls
@@ -208,6 +210,7 @@ hklet
 hndl
 Homebrewery
 homebrews
+homecraft
 hoose
 hotb
 HotB
@@ -325,6 +328,7 @@ MPMM
 msak
 msbcr
 Muderator
+Mukkabout
 mult
 Mult
 Multable
@@ -367,6 +371,7 @@ PaBTSO
 padder
 pagebreak
 pagecontent
+pageless
 panzoom
 parsestatblock
 parsestatblockadd
@@ -445,6 +450,7 @@ sctabs
 selecteds
 sels
 sents
+Shoutout
 showsearch
 sidemenu
 Sidemenu
@@ -588,4 +594,5 @@ XMTS
 xpand
 Xpand
 XPHB
+XSCREEN
 yxxx
